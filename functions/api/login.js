@@ -58,6 +58,13 @@ export async function onRequest(context) {
     }
 
     const verification = await verifyPassword(password, row.password_hash);
+    if (verification.unsupported === "ITERATIONS_TOO_HIGH") {
+      throw new ApiError(
+        "该账户使用了旧版密码哈希，需要重置密码后才能登录",
+        409,
+        "PASSWORD_HASH_MIGRATION_REQUIRED"
+      );
+    }
     if (!verification.ok) {
       throw new ApiError("用户名或密码错误", 401, "BAD_CREDENTIALS");
     }

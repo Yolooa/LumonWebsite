@@ -90,7 +90,7 @@ export function clearSessionCookie() {
 
 export async function hashPassword(password) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iterations = 120000;
+  const iterations = 100000;
   const material = await crypto.subtle.importKey(
     "raw",
     encoder.encode(password),
@@ -126,6 +126,13 @@ export async function verifyPassword(password, storedValue) {
   if (algorithm !== "pbkdf2" || !saltValue || !hashValue) return { ok: false, needsUpgrade: false };
   const iterations = Number(iterationValue);
   if (!Number.isFinite(iterations) || iterations < 10000) return { ok: false, needsUpgrade: false };
+  if (iterations > 100000) {
+    return {
+      ok: false,
+      needsUpgrade: false,
+      unsupported: "ITERATIONS_TOO_HIGH"
+    };
+  }
 
   const material = await crypto.subtle.importKey(
     "raw",
