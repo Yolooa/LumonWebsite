@@ -3,8 +3,8 @@
  *
  * Cloudflare Pages Functions contract:
  *   GET    /api/session              -> { success, user }
- *   POST   /api/login                -> existing Cloudflare login function
- *   POST   /api/register             -> existing Cloudflare register function
+ *   POST   /api/login                -> PBKDF2 login + signed HttpOnly session
+ *   POST   /api/register             -> PBKDF2 registration + signed session
  *   POST   /api/logout               -> { success }
  *   GET    /api/todos                -> { success, todos }
  *   POST   /api/todos                -> { success, todo }
@@ -295,8 +295,13 @@
       const guestUser = { ...guest };
       emit("pellosy:session", guestUser);
       return guestUser;
-    } catch {
-      /* Cloudflare session route may not be deployed yet. */
+    } catch (error) {
+      if (error?.status === 401) {
+        clearCachedUser();
+        const guestUser = { ...guest };
+        emit("pellosy:session", guestUser);
+        return guestUser;
+      }
     }
     const cached = getCachedUser();
     emit("pellosy:session", cached);
@@ -310,6 +315,7 @@
         identifier: payload.identifier,
         username: payload.username || payload.identifier,
         password: payload.password,
+        remember: remember !== false,
         turnstileToken: payload.turnstileToken || ""
       }
     });
@@ -338,6 +344,7 @@
         username: payload.username,
         email: payload.email || "",
         password: payload.password,
+        remember: remember !== false,
         turnstileToken: payload.turnstileToken || ""
       }
     });
@@ -512,6 +519,44 @@
     }));
   }
 
+  async function executeCode(payload) {
+    const data = await request("/execute", {
+      method: "POST",
+      body: {
+        language: payload.language,
+        content: payload.content,
+        stdin: payload.stdin || "",
+        provider: payload.provider || "auto"
+      },
+      timeout: 26000
+    });
+    return {
+      language: String(data.language || payload.language || ""),
+      provider: String(data.provider || ""),
+      version: String(data.version || ""),
+      compileOutput: String(data.compileOutput || ""),
+      compileCode: Number(data.compileCode || 0),
+      stdout: String(data.stdout || ""),
+      stderr: String(data.stderr || ""),
+      output: String(data.output || ""),
+      exitCode: Number(data.exitCode || 0),
+      signal: String(data.signal || "")
+    };
+  }
+
+  async function executionStatus(probe = false) {
+    const data = await request(`/execute/status${probe ? "?probe=1" : ""}`, {
+      timeout: probe ? 14000 : 8000
+    });
+    return {
+      provider: String(data.provider || ""),
+      local: data.local || false,
+      remote: data.remote || {},
+      wandboxUrl: String(data.wandboxUrl || ""),
+      pistonUrl: String(data.pistonUrl || "")
+    };
+  }
+
   async function createGroup(payload) {
     const data = await request("/messages/groups", {
       method: "POST",
@@ -565,6 +610,10 @@
       lookup: lookupFriend,
       list: listFriends,
       add: addFriend
+    },
+    execution: {
+      run: executeCode,
+      status: executionStatus
     },
     request
   };

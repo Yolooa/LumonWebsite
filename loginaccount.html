@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f1f0eb">
   <meta name="description" content="Pellosy Cloudflare account access">
+  <script src="theme-sync.js"></script>
   <title>账户 / Pellosy</title>
   <style>
     :root {
@@ -44,6 +45,7 @@
       background: var(--paper);
       font-family: var(--sans);
       -webkit-font-smoothing: antialiased;
+      transition: color 0.32s ease, background-color 0.32s ease;
     }
 
     body::before {
@@ -57,7 +59,7 @@
       font-size: clamp(150px, 27vw, 420px);
       font-weight: 900;
       line-height: 0.8;
-      -webkit-text-stroke: 1px rgba(8, 8, 8, 0.08);
+      -webkit-text-stroke: 1px var(--ambient-line);
       pointer-events: none;
       user-select: none;
     }
@@ -122,7 +124,7 @@
       position: absolute;
       width: 62vw;
       height: 32vw;
-      border: 1px solid rgba(8, 8, 8, 0.17);
+      border: 1px solid var(--ambient-line);
       border-radius: 50%;
       transform: rotate(-18deg);
       animation: lineReveal 1.15s var(--ease) both;
@@ -139,7 +141,7 @@
     .background-lines::after {
       left: 24vw;
       bottom: -16vw;
-      border-color: rgba(8, 8, 8, 0.1);
+      border-color: var(--ambient-line);
       animation-delay: 0.12s;
     }
 
@@ -168,7 +170,7 @@
     .floating-object {
       position: absolute;
       display: block;
-      color: rgba(8, 8, 8, 0.22);
+      color: var(--float-ink);
       filter: drop-shadow(0 16px 24px rgba(8, 8, 8, 0.06));
       mix-blend-mode: multiply;
       will-change: transform;
@@ -232,7 +234,7 @@
       width: 38px;
       height: 38px;
       place-items: center;
-      color: #fff;
+      color: var(--paper);
       background: var(--ink);
       border-radius: 50%;
       font-family: var(--serif);
@@ -260,8 +262,8 @@
       min-height: 34px;
       align-items: center;
       padding: 0 12px;
-      background: rgba(255, 255, 255, 0.28);
-      border: 1px solid rgba(255, 255, 255, 0.66);
+      background: color-mix(in srgb, var(--paper) 35%, transparent);
+      border: 1px solid var(--line);
       border-radius: 999px;
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -346,8 +348,8 @@
       max-width: 530px;
       margin-top: 27px;
       padding-top: 15px;
-      color: #454640;
-      border-top: 1px solid rgba(8, 8, 8, 0.48);
+      color: var(--text-soft);
+      border-top: 1px solid var(--line-strong);
       font-family: var(--serif);
       font-size: 14px;
       line-height: 1.75;
@@ -395,8 +397,8 @@
     .account-card {
       position: relative;
       overflow: hidden;
-      background: rgba(250, 250, 247, 0.68);
-      border: 1px solid rgba(8, 8, 8, 0.42);
+      background: var(--glass-card);
+      border: 1px solid var(--line-strong);
       border-radius: 8px;
       backdrop-filter: blur(28px) saturate(150%);
       -webkit-backdrop-filter: blur(28px) saturate(150%);
@@ -466,7 +468,7 @@
       gap: 4px;
       margin: 16px 22px 0;
       padding: 4px;
-      background: rgba(8, 8, 8, 0.055);
+      background: var(--panel-3);
       border: 1px solid var(--line);
       border-radius: 999px;
       isolation: isolate;
@@ -480,7 +482,7 @@
       left: 4px;
       z-index: 0;
       width: calc(50% - 6px);
-      background: var(--ink);
+      background: var(--accent);
       border-radius: inherit;
       box-shadow: 0 5px 16px rgba(8, 8, 8, 0.16);
       transform: translateX(0);
@@ -508,7 +510,7 @@
     }
 
     .auth-tab[aria-selected="true"] {
-      color: var(--paper);
+      color: var(--accent-ink);
       transform: none;
     }
 
@@ -570,7 +572,7 @@
       height: 42px;
       padding: 0 12px;
       color: var(--ink);
-      background: rgba(255, 255, 255, 0.4);
+      background: var(--glass-input);
       border: 1px solid var(--line);
       border-radius: 6px;
       outline: none;
@@ -583,7 +585,7 @@
     }
 
     .field input:focus {
-      background: rgba(255, 255, 255, 0.72);
+      background: var(--glass-input-focus);
       border-color: var(--ink);
       box-shadow: 0 0 0 3px rgba(229, 255, 0, 0.42);
       transform: translateY(-1px);
@@ -708,8 +710,8 @@
       margin-top: 2px;
       padding: 9px 10px;
       color: var(--muted);
-      background: rgba(229, 255, 0, 0.18);
-      border: 1px solid rgba(8, 8, 8, 0.14);
+      background: rgba(var(--accent-rgb), 0.12);
+      border: 1px solid var(--line);
       border-radius: 6px;
       font-family: var(--mono);
       font-size: 8px;
@@ -848,7 +850,7 @@
       min-width: 0;
       height: 40px;
       padding: 0 12px;
-      background: rgba(255, 255, 255, 0.4);
+      background: var(--glass-input);
       border: 1px solid var(--line);
       border-radius: 6px;
       outline: none;
@@ -875,7 +877,7 @@
     }
 
     .account-card.is-authenticated {
-      border-color: rgba(8, 8, 8, 0.62);
+      border-color: var(--line-strong);
       box-shadow: 0 26px 72px rgba(17, 18, 15, 0.16);
       transition: border-color 0.35s ease, box-shadow 0.35s ease;
     }
@@ -1209,6 +1211,34 @@
       76% {
         transform: translateX(-2px);
       }
+    }
+
+    [data-theme="night"] body::after {
+      opacity: 0.035;
+      mix-blend-mode: screen;
+    }
+
+    [data-theme="night"] .account-card::before {
+      background: linear-gradient(
+        130deg,
+        rgba(255, 255, 255, 0.08),
+        transparent 34% 70%,
+        rgba(255, 255, 255, 0.035)
+      );
+    }
+
+    [data-theme="night"] .floating-object {
+      filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.22));
+    }
+
+    [data-theme="night"] .submit-button {
+      color: var(--paper);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    [data-theme="paper"] .account-card {
+      box-shadow: 0 22px 60px rgba(74, 53, 35, 0.14);
     }
 
     @media (max-width: 900px) {
@@ -1681,7 +1711,7 @@
 
         widgets[kind] = window.turnstile.render(box, {
           sitekey: turnstileConfig.siteKey,
-          theme: "light",
+          theme: document.documentElement.dataset.theme === "night" ? "dark" : "light",
           callback: (token) => {
             tokens[kind] = token || "";
             setTurnstileNote(kind, "验证已通过", "ok");
@@ -1725,6 +1755,19 @@
           } catch {}
         }
         setTurnstileNote(kind, "");
+      }
+
+      function refreshTurnstileTheme() {
+        if (!window.turnstile || typeof window.turnstile.remove !== "function") return;
+        ["login", "register"].forEach((kind) => {
+          if (widgets[kind] === null) return;
+          try {
+            window.turnstile.remove(widgets[kind]);
+          } catch {}
+          widgets[kind] = null;
+          tokens[kind] = "";
+          renderTurnstile(kind);
+        });
       }
 
       function setSubmitting(form, submitting, label) {
@@ -1886,6 +1929,7 @@
         });
         $("#loginForm").addEventListener("submit", handleLogin);
         $("#registerForm").addEventListener("submit", handleRegister);
+        window.addEventListener("pellosy:theme-change", refreshTurnstileTheme);
         $("#logoutButton").addEventListener("click", async () => {
           await cloud.logout();
           currentUser = { ...cloud.guest };

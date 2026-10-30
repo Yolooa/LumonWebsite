@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#fafaf8">
   <meta name="description" content="Pellosy 个人量化线场">
+  <script src="theme-sync.js"></script>
   <title>Personal Field / Pellosy</title>
   <style>
     :root {
@@ -46,6 +47,7 @@
       font-size: 14px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      transition: color 0.3s ease, background-color 0.3s ease;
     }
 
     body::before {
@@ -57,7 +59,7 @@
       background-image: repeating-linear-gradient(
         90deg,
         transparent 0 79px,
-        rgba(32, 34, 32, 0.045) 79px 80px
+        var(--ambient-line) 79px 80px
       );
     }
 
@@ -412,7 +414,7 @@
       inset: 6px 0 0;
       z-index: 0;
       background: var(--plate);
-      border: 1px solid rgba(32, 34, 32, 0.12);
+      border: 1px solid var(--line);
       border-radius: 17px;
       opacity: 0.7;
       transform: translateY(0);
@@ -617,11 +619,11 @@
     }
 
     .note-status.is-error {
-      color: #9e3128;
+      color: var(--red);
     }
 
     .note-status.is-success {
-      color: #497819;
+      color: var(--success);
     }
 
     .personal-note {
@@ -813,7 +815,7 @@
 
     .dialog-copy {
       margin-top: 19px;
-      color: #4f544d;
+      color: var(--text-soft);
       font-size: 13px;
       line-height: 1.85;
     }
@@ -845,7 +847,7 @@
 
     .dialog-editor:focus {
       border-color: var(--signal);
-      box-shadow: 0 0 0 3px rgba(38, 125, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
     }
 
     .dialog-actions {
@@ -863,11 +865,11 @@
     }
 
     .dialog-sync.is-error {
-      color: #9e3128;
+      color: var(--red);
     }
 
     .dialog-sync.is-success {
-      color: #497819;
+      color: var(--success);
     }
 
     .dialog-save {
@@ -933,7 +935,7 @@
       margin: 15px 0;
       padding: 12px 14px;
       color: var(--ink);
-      background: #eeeeeb;
+      background: var(--glass-card);
       border: 1px solid var(--line);
       border-radius: 8px;
       font-size: 11px;
@@ -1065,6 +1067,64 @@
       to {
         transform: translateX(180%);
       }
+    }
+
+    [data-theme="glass"] .trait-card {
+      --card-bg: #f3f6fa;
+      --card-ink: #131923;
+      --card-muted: #6b7786;
+      --card-border: rgba(19, 25, 35, 0.13);
+      --plate: #dce5ef;
+    }
+
+    [data-theme="night"] .trait-card {
+      --card-bg: #141c26;
+      --card-ink: #f3f7fb;
+      --card-muted: #8190a1;
+      --card-border: rgba(255, 255, 255, 0.18);
+      --plate: #0a1016;
+    }
+
+    [data-theme="night"] .trait-card[data-tone="blue"] {
+      --card-bg: #244ca6;
+      --card-ink: #f3f7fb;
+      --card-muted: #d6e1ff;
+      --card-border: #3b63c1;
+      --plate: #132b63;
+    }
+
+    [data-theme="night"] .trait-card[data-tone="black"] {
+      --card-bg: #070b0f;
+      --card-ink: #f3f7fb;
+      --card-muted: #9eb0c2;
+      --card-border: #26313d;
+      --plate: #131b24;
+    }
+
+    [data-theme="paper"] .trait-card {
+      --card-bg: #f7f0e6;
+      --card-ink: #251e18;
+      --card-muted: #817264;
+      --card-border: rgba(54, 38, 24, 0.16);
+      --plate: #ddcfbc;
+    }
+
+    [data-theme="night"] .site-header,
+    [data-theme="night"] .site-footer,
+    [data-theme="night"] .note-panel,
+    [data-theme="night"] .rhythm-panel,
+    [data-theme="night"] .mood-panel {
+      border-color: var(--line);
+    }
+
+    [data-theme="night"] .console-link,
+    [data-theme="night"] .motion-toggle {
+      background: var(--glass-card);
+    }
+
+    [data-theme="night"] dialog {
+      background: var(--paper);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.56);
     }
 
     @media (max-width: 950px) {

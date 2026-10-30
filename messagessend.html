@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#efeee9">
   <meta name="description" content="Pellosy private messages">
+  <script src="theme-sync.js"></script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Cpath d='M23 47V17h12c8 0 13 4 13 11s-5 11-13 11h-5v8H23Zm7-15h5c4 0 6-1 6-4s-2-4-6-4h-5v8Z' fill='%23e5ff00'/%3E%3C/svg%3E">
   <title>私聊 / Pellosy</title>
   <style>
@@ -48,7 +49,7 @@
       overflow: hidden;
       color: var(--ink);
       background:
-        linear-gradient(130deg, transparent 0 54%, rgba(229, 255, 0, 0.17) 54% 62%, transparent 62%),
+        linear-gradient(130deg, transparent 0 54%, rgba(var(--accent-rgb), 0.15) 54% 62%, transparent 62%),
         var(--paper);
       font-family: var(--sans);
       -webkit-font-smoothing: antialiased;
@@ -62,8 +63,8 @@
       pointer-events: none;
       opacity: 0.25;
       background-image:
-        linear-gradient(rgba(8, 8, 8, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(8, 8, 8, 0.06) 1px, transparent 1px);
+        linear-gradient(var(--ambient-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--ambient-line) 1px, transparent 1px);
       background-size: 72px 72px;
       mask-image: linear-gradient(120deg, #000, transparent 78%);
     }
@@ -211,8 +212,8 @@
       align-items: center;
       gap: 8px;
       padding: 0 12px 0 7px;
-      background: rgba(255, 255, 255, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.65);
+      background: var(--glass-input);
+      border: 1px solid var(--line);
       border-radius: 999px;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -269,8 +270,8 @@
       min-height: 0;
       grid-template-columns: minmax(280px, 0.65fr) minmax(0, 1.65fr);
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.56);
+      background: color-mix(in srgb, var(--paper) 20%, transparent);
+      border: 1px solid var(--line);
       border-radius: 8px;
       backdrop-filter: blur(24px) saturate(150%);
       -webkit-backdrop-filter: blur(24px) saturate(150%);
@@ -399,12 +400,13 @@
     }
 
     .conversation-item:hover {
-      background: rgba(255, 255, 255, 0.28);
+      background: color-mix(in srgb, var(--paper) 28%, transparent);
     }
 
     .conversation-item[aria-current="true"] {
       background: var(--yellow);
-      border-color: rgba(8, 8, 8, 0.12);
+      border-color: var(--line-strong);
+      color: var(--accent-ink);
     }
 
     .conversation-avatar {
@@ -420,9 +422,9 @@
     }
 
     .conversation-item[data-type="group"] .conversation-avatar {
-      color: var(--ink);
+      color: var(--accent-ink);
       background: var(--yellow);
-      border: 1px solid rgba(8, 8, 8, 0.5);
+      border: 1px solid var(--line-strong);
     }
 
     .conversation-copy {
@@ -448,7 +450,7 @@
     }
 
     .conversation-item[aria-current="true"] .conversation-copy span {
-      color: rgba(8, 8, 8, 0.62);
+      color: color-mix(in srgb, var(--accent-ink) 62%, transparent);
     }
 
     .conversation-meta {
@@ -637,7 +639,7 @@
     .message-bubble {
       padding: 9px 11px;
       color: var(--ink);
-      background: rgba(255, 255, 255, 0.53);
+      background: color-mix(in srgb, var(--paper) 52%, transparent);
       border: 1px solid var(--line);
       border-radius: 8px;
       overflow-wrap: anywhere;
@@ -681,7 +683,7 @@
       max-height: 110px;
       padding: 10px 12px;
       color: var(--ink);
-      background: rgba(255, 255, 255, 0.45);
+      background: var(--glass-input);
       border: 1px solid var(--line);
       border-radius: 7px;
       outline: none;
@@ -700,9 +702,9 @@
       width: 38px;
       height: 40px;
       place-items: center;
-      color: var(--ink);
+      color: var(--accent-ink);
       background: var(--yellow);
-      border: 1px solid rgba(8, 8, 8, 0.38);
+      border: 1px solid var(--line-strong);
       border-radius: 50%;
       font-size: 16px;
     }
@@ -746,12 +748,12 @@
       background: var(--paper);
       border: 1px solid var(--ink);
       border-radius: 8px;
-      box-shadow: 0 28px 90px rgba(8, 8, 8, 0.24);
+      box-shadow: 0 28px 90px var(--dialog-shadow);
       overflow: hidden;
     }
 
     dialog::backdrop {
-      background: rgba(8, 8, 8, 0.38);
+      background: var(--overlay);
       backdrop-filter: blur(7px);
       -webkit-backdrop-filter: blur(7px);
     }
@@ -828,7 +830,7 @@
       width: 100%;
       padding: 10px 11px;
       color: var(--ink);
-      background: rgba(255, 255, 255, 0.45);
+      background: var(--glass-input);
       border: 1px solid var(--line);
       border-radius: 6px;
       outline: none;
@@ -906,9 +908,9 @@
     .lookup-button {
       min-width: 76px;
       padding: 0 13px;
-      color: var(--ink);
+      color: var(--accent-ink);
       background: var(--yellow);
-      border: 1px solid rgba(8, 8, 8, 0.36);
+      border: 1px solid var(--line-strong);
       border-radius: 6px;
       font-size: 9px;
       font-weight: 700;
@@ -930,7 +932,7 @@
       align-items: center;
       gap: 10px;
       padding: 10px;
-      background: rgba(255, 255, 255, 0.48);
+      background: color-mix(in srgb, var(--paper) 48%, transparent);
       border: 1px solid var(--line);
       border-radius: 7px;
       animation: resultCardIn 0.42s var(--spring) both;
@@ -1020,7 +1022,7 @@
       align-items: center;
       gap: 10px;
       padding: 8px 10px;
-      background: rgba(255, 255, 255, 0.34);
+      background: var(--glass-input);
       border: 1px solid var(--line);
       border-radius: 7px;
     }
@@ -1079,7 +1081,7 @@
       gap: 9px;
       padding: 7px 9px;
       color: var(--ink);
-      background: rgba(255, 255, 255, 0.25);
+      background: color-mix(in srgb, var(--paper) 25%, transparent);
       border: 1px solid transparent;
       border-radius: 7px;
       text-align: left;
@@ -1089,12 +1091,12 @@
     }
 
     .friend-option:hover {
-      background: rgba(255, 255, 255, 0.55);
+      background: color-mix(in srgb, var(--paper) 55%, transparent);
     }
 
     .friend-option[aria-pressed="true"] {
-      background: rgba(229, 255, 0, 0.38);
-      border-color: rgba(8, 8, 8, 0.24);
+      background: rgba(var(--accent-rgb), 0.25);
+      border-color: var(--line-strong);
     }
 
     .friend-option-avatar {
@@ -1139,7 +1141,7 @@
     }
 
     .friend-option[aria-pressed="true"] .friend-check {
-      color: var(--ink);
+      color: var(--accent-ink);
       background: var(--yellow);
       border-color: var(--ink);
       transform: scale(1.08);
@@ -1230,6 +1232,58 @@
     .toast.is-visible {
       opacity: 1;
       translate: 0 0;
+    }
+
+    [data-theme="night"] .chat-motif {
+      filter: grayscale(1) invert(1) contrast(1.3);
+      mix-blend-mode: screen;
+    }
+
+    [data-theme="night"] .chat-motif-group-a {
+      --motif-opacity: 0.14;
+    }
+
+    [data-theme="night"] .chat-motif-user-a {
+      --motif-opacity: 0.12;
+    }
+
+    [data-theme="night"] .chat-motif-group-b {
+      --motif-opacity: 0.09;
+    }
+
+    [data-theme="night"] .messenger {
+      box-shadow: 0 18px 58px rgba(0, 0, 0, 0.34);
+    }
+
+    [data-theme="night"] dialog {
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58);
+    }
+
+    [data-theme="paper"] .messenger {
+      box-shadow: 0 18px 50px rgba(74, 53, 35, 0.14);
+    }
+
+    .header-link:hover,
+    .side-action:first-child:hover,
+    .lookup-button:hover,
+    .dialog-submit:not(:disabled):hover,
+    .friend-result-action:not(:disabled):hover {
+      color: var(--accent-ink);
+    }
+
+    body,
+    .topbar,
+    .messenger,
+    .conversation-panel,
+    .chat-panel,
+    .message-bubble,
+    dialog,
+    .form-status {
+      transition:
+        color 0.28s ease,
+        background-color 0.28s ease,
+        border-color 0.28s ease,
+        box-shadow 0.28s ease;
     }
 
     .route-curtain {

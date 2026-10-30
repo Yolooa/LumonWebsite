@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-theme="glass">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b0c0a">
+  <meta name="theme-color" content="#efeee9">
   <meta name="description" content="Lumon Studio browser IDE">
+  <script src="theme-sync.js"></script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230b0c0a'/%3E%3Cpath d='m18 22 10 10-10 10M34 42h14' fill='none' stroke='%23d8ff00' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <title>Lumon Studio / IDE</title>
   <style>
@@ -25,6 +26,14 @@
       --orange: #ff9d5c;
       --red: #ff6961;
       --green: #7ad69b;
+      --preview-bg: #ffffff;
+      --console-bg: #090a08;
+      --console-text: #d7d9d0;
+      --console-line: rgba(255, 255, 255, 0.05);
+      --console-time: #646a60;
+      --overlay: rgba(0, 0, 0, 0.56);
+      --dialog-shadow: rgba(0, 0, 0, 0.5);
+      --floating-shadow: rgba(0, 0, 0, 0.34);
       --sidebar-width: 252px;
       --preview-width: 36vw;
       --header-h: 48px;
@@ -36,29 +45,38 @@
       --spring: cubic-bezier(0.2, 1.35, 0.35, 1);
     }
 
-    [data-theme="light"] {
-      --bg: #e9e9e2;
-      --panel: #f3f3ed;
-      --panel-2: #e7e7df;
-      --panel-3: #dcddd4;
-      --editor: #f8f8f3;
+    [data-theme="glass"] {
+      --bg: #efeee9;
+      --panel: rgba(250, 250, 247, 0.82);
+      --panel-2: rgba(255, 255, 255, 0.52);
+      --panel-3: rgba(8, 8, 8, 0.065);
+      --editor: #f7f6f1;
       --text: #11120f;
       --text-soft: #3d4039;
       --muted: #777b71;
       --line: rgba(8, 8, 8, 0.11);
       --line-strong: rgba(8, 8, 8, 0.22);
-      --accent: #b9df00;
-      --accent-rgb: 185, 223, 0;
+      --accent: #e5ff00;
+      --accent-rgb: 229, 255, 0;
       --blue: #3157d8;
       --orange: #c75b1b;
       --red: #bd3028;
       --green: #3c7d51;
+      --preview-bg: #fbfbf7;
+      --console-bg: #e8e8e1;
+      --console-text: #242720;
+      --console-line: rgba(8, 8, 8, 0.07);
+      --console-time: #7a7e73;
+      --overlay: rgba(25, 28, 22, 0.34);
+      --dialog-shadow: rgba(35, 39, 31, 0.22);
+      --floating-shadow: rgba(35, 39, 31, 0.16);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      scrollbar-color: var(--line-strong) transparent;
     }
 
     html,
@@ -72,8 +90,25 @@
 
     body {
       color: var(--text);
+      background:
+        linear-gradient(130deg, transparent 0 54%, rgba(var(--accent-rgb), 0.12) 54% 63%, transparent 63%),
+        var(--bg);
       font-family: var(--sans);
       -webkit-font-smoothing: antialiased;
+    }
+
+    [data-theme="glass"] .app-header,
+    [data-theme="glass"] .activity-bar,
+    [data-theme="glass"] .sidebar,
+    [data-theme="glass"] .statusbar,
+    [data-theme="glass"] .preview-panel,
+    [data-theme="paper"] .app-header,
+    [data-theme="paper"] .activity-bar,
+    [data-theme="paper"] .sidebar,
+    [data-theme="paper"] .statusbar,
+    [data-theme="paper"] .preview-panel {
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
     }
 
     button,
@@ -1028,7 +1063,7 @@
     .preview-body {
       position: relative;
       min-height: 0;
-      background: #fff;
+      background: var(--preview-bg);
     }
 
     .preview-view,
@@ -1044,7 +1079,7 @@
       width: 100%;
       height: 100%;
       border: 0;
-      background: #fff;
+      background: var(--preview-bg);
     }
 
     .runtime-state {
@@ -1070,9 +1105,9 @@
 
     .console-view {
       display: grid;
-      grid-template-rows: minmax(0, 1fr);
-      color: #d7d9d0;
-      background: #090a08;
+      grid-template-rows: minmax(0, 1fr) auto;
+      color: var(--console-text);
+      background: var(--console-bg);
     }
 
     .console-output {
@@ -1091,19 +1126,129 @@
       grid-template-columns: 44px minmax(0, 1fr);
       gap: 7px;
       padding: 2px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--console-line);
     }
 
     .console-line time {
-      color: #646a60;
+      color: var(--console-time);
     }
 
     .console-line.is-error {
-      color: #ff8a84;
+      color: var(--red);
     }
 
     .console-line.is-warn {
-      color: #ffc268;
+      color: var(--orange);
+    }
+
+    .execution-stdin {
+      display: grid;
+      gap: 7px;
+      padding: 9px 11px 11px;
+      background: color-mix(in srgb, var(--console-bg) 88%, var(--panel));
+      border-top: 1px solid var(--console-line);
+    }
+
+    .execution-head,
+    .execution-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--console-time);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .execution-stdin textarea {
+      width: 100%;
+      min-height: 54px;
+      max-height: 130px;
+      padding: 8px 9px;
+      color: var(--console-text);
+      background: color-mix(in srgb, var(--console-bg) 86%, transparent);
+      border: 1px solid var(--console-line);
+      border-radius: 4px;
+      outline: none;
+      resize: vertical;
+      font-family: var(--mono);
+      font-size: 9px;
+      line-height: 1.5;
+    }
+
+    .execution-stdin textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.09);
+    }
+
+    .execution-run {
+      display: inline-flex;
+      min-height: 27px;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 0 10px;
+      color: #10120d;
+      background: var(--accent);
+      border-radius: 4px;
+      font-family: var(--sans);
+      font-size: 7px;
+      font-weight: 700;
+    }
+
+    .execution-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .execution-actions select {
+      height: 27px;
+      padding: 0 24px 0 8px;
+      color: var(--console-text);
+      background: color-mix(in srgb, var(--console-bg) 88%, var(--panel));
+      border: 1px solid var(--console-line);
+      border-radius: 4px;
+      outline: none;
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .execution-diagnostic {
+      min-height: 27px;
+      padding: 0 8px;
+      color: var(--console-text);
+      background: transparent;
+      border: 1px solid var(--console-line);
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .execution-diagnostic:hover {
+      border-color: var(--accent);
+    }
+
+    .execution-privacy {
+      color: var(--console-time);
+      font-family: var(--mono);
+      font-size: 7px;
+      line-height: 1.55;
+    }
+
+    .execution-privacy.is-remote {
+      color: var(--orange);
+    }
+
+    .execution-run:hover {
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+
+    .execution-run:disabled {
+      cursor: wait;
+      opacity: 0.58;
+      transform: none;
     }
 
     .statusbar {
@@ -1149,11 +1294,11 @@
       background: var(--panel);
       border: 1px solid var(--line-strong);
       border-radius: 7px;
-      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.52);
+      box-shadow: 0 30px 100px var(--dialog-shadow);
     }
 
     .dialog::backdrop {
-      background: rgba(0, 0, 0, 0.58);
+      background: var(--overlay);
       backdrop-filter: blur(5px);
     }
 
@@ -1253,7 +1398,7 @@
       align-items: start;
       justify-items: center;
       padding: min(12vh, 110px) 16px 16px;
-      background: rgba(0, 0, 0, 0.52);
+      background: var(--overlay);
       backdrop-filter: blur(4px);
     }
 
@@ -1264,7 +1409,7 @@
       background: var(--panel);
       border: 1px solid var(--line-strong);
       border-radius: 7px;
-      box-shadow: 0 32px 100px rgba(0, 0, 0, 0.48);
+      box-shadow: 0 32px 100px var(--dialog-shadow);
       animation: commandIn 0.3s var(--spring) both;
     }
 
@@ -1363,7 +1508,7 @@
       background: var(--panel);
       border: 1px solid var(--line-strong);
       border-radius: 5px;
-      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.36);
+      box-shadow: 0 16px 44px var(--floating-shadow);
       animation: contextIn 0.18s var(--ease) both;
     }
 
@@ -1398,7 +1543,7 @@
       color: #0a0b08;
       background: var(--accent);
       border-radius: 4px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.24);
+      box-shadow: 0 15px 40px var(--floating-shadow);
       font-size: 8px;
       font-weight: 650;
       opacity: 0;
@@ -1417,9 +1562,30 @@
       inset: 0;
       z-index: 3;
       visibility: hidden;
-      background: rgba(0, 0, 0, 0.46);
+      background: var(--overlay);
       opacity: 0;
       transition: opacity 0.22s ease, visibility 0.22s ease;
+    }
+
+    body,
+    .app-header,
+    .activity-bar,
+    .sidebar,
+    .editor-panel,
+    .editor-tabs,
+    .breadcrumb,
+    .preview-panel,
+    .preview-head,
+    .statusbar,
+    .command-panel,
+    .dialog,
+    .console-view,
+    .execution-stdin {
+      transition:
+        color 0.3s ease,
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
     }
 
     @keyframes bootMark {
@@ -1500,7 +1666,7 @@
         bottom: var(--status-h);
         width: min(520px, calc(100vw - 46px));
         border-left: 1px solid var(--line-strong);
-        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.3);
+        box-shadow: -20px 0 60px var(--floating-shadow);
         transform: translateX(0);
         transition: transform 0.34s var(--ease), visibility 0.34s ease;
       }
@@ -1550,7 +1716,7 @@
         bottom: 0;
         left: 42px;
         width: min(280px, calc(100vw - 42px));
-        box-shadow: 18px 0 52px rgba(0, 0, 0, 0.36);
+        box-shadow: 18px 0 52px var(--floating-shadow);
         transform: translateX(-105%);
         transition: transform 0.32s var(--ease);
       }
@@ -1636,6 +1802,7 @@
     <symbol id="i-panel-left" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
     <symbol id="i-panel-right" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15.5A8 8 0 0 1 8.5 4 8.2 8.2 0 1 0 20 15.5Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></symbol>
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
@@ -1654,7 +1821,7 @@
 
   <div class="ide-app" id="ideApp" aria-hidden="true">
     <header class="app-header">
-      <a class="studio-brand" href="index.html" aria-label="返回 Lumonsky 控制台">
+      <a class="studio-brand" href="index.html" data-home-link aria-label="返回 Lumonsky 控制台">
         <span class="studio-brand-mark">LS</span>
         <span class="studio-brand-copy">
           <strong>LUMON STUDIO</strong>
@@ -1679,7 +1846,7 @@
           <svg class="icon"><use href="#i-panel-right"></use></svg>
           <span>预览</span>
         </button>
-        <button class="tool-button is-primary" id="runButton" type="button" aria-label="运行当前项目">
+        <button class="tool-button is-primary" id="runButton" type="button" aria-label="运行当前文件">
           <svg class="icon"><use href="#i-play"></use></svg>
           <span>运行</span>
         </button>
@@ -1796,12 +1963,32 @@
           <div class="preview-view" id="previewView">
             <div class="runtime-state" id="runtimeState">
               <strong>尚未运行</strong>
-              <span>打开 HTML 文件后点击运行</span>
+              <span>打开任意文件后点击运行</span>
             </div>
             <iframe id="previewFrame" title="项目预览" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
           </div>
           <div class="console-view" id="consoleView" hidden>
             <div class="console-output" id="consoleOutput"></div>
+            <form class="execution-stdin" id="executionForm">
+              <div class="execution-head">
+                <span>STANDARD INPUT</span>
+                <span id="executionRuntime">LOCAL SANDBOX</span>
+              </div>
+              <textarea id="executionInput" spellcheck="false" placeholder="程序运行前输入 stdin 内容，例如 scanf / input() 读取的数据"></textarea>
+              <p class="execution-privacy" id="executionPrivacy">本地模式：代码只会在这台电脑上编译和运行。</p>
+              <div class="execution-foot">
+                <span id="executionStatus">等待运行</span>
+                <span class="execution-actions">
+                  <button class="execution-diagnostic" id="executionDiagnostics" type="button">检测环境</button>
+                  <select id="executionProvider" aria-label="代码执行器">
+                    <option value="local" selected>本地</option>
+                    <option value="auto">自动（本地优先）</option>
+                    <option value="wandbox">Wandbox（第三方在线）</option>
+                  </select>
+                  <button class="execution-run" id="executionRun" type="submit">运行当前文件</button>
+                </span>
+              </div>
+            </form>
           </div>
         </div>
       </aside>
@@ -1884,7 +2071,6 @@
       const cloud = window.PellosyCloud;
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const STORAGE_KEY = "lumon.studio.workspace.v1";
-      const THEME_KEY = "lumon.studio.theme.v1";
       const LAYOUT_KEY = "lumon.studio.layout.v1";
 
       const LANGUAGE_MAP = {
@@ -1956,6 +2142,20 @@
         xml: "XML",
         ini: "INI",
         plaintext: "Plain Text"
+      };
+
+      const CLOUD_RUNTIMES = {
+        python: { language: "python", label: "Python", fileName: "main.py" },
+        c: { language: "c", label: "C", fileName: "main.c" },
+        cpp: { language: "cpp", label: "C++", fileName: "main.cpp" },
+        java: { language: "java", label: "Java", fileName: "Main.java" },
+        go: { language: "go", label: "Go", fileName: "main.go" },
+        rust: { language: "rust", label: "Rust", fileName: "main.rs" },
+        csharp: { language: "csharp", label: "C#", fileName: "Program.cs" },
+        php: { language: "php", label: "PHP", fileName: "main.php" },
+        ruby: { language: "ruby", label: "Ruby", fileName: "main.rb" },
+        shell: { language: "shell", label: "Bash", fileName: "main.sh" },
+        sql: { language: "sqlite", label: "SQLite", fileName: "main.sql" }
       };
 
       const STARTER_FILES = [
@@ -3002,38 +3202,468 @@ button.addEventListener("click", () => {
         $("#consoleOutput").scrollTop = $("#consoleOutput").scrollHeight;
       }
 
-      function runPreview() {
-        if (!workspace) return;
-        let htmlFile = activePath && extension(activePath) === "html"
-          ? findFile(activePath)
-          : null;
-        if (!htmlFile) {
-          htmlFile = findFile("index.html")
-            || workspace.files.find((file) => extension(file.path) === "html");
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function safeRuntimeScript(value) {
+        return String(value || "").replace(/<\/script/gi, "<\\/script");
+      }
+
+      function safeRuntimeStyle(value) {
+        return String(value || "").replace(/<\/style/gi, "<\\/style");
+      }
+
+      function runnerTheme() {
+        const themes = {
+          glass: {
+            bg: "#f6f8fb",
+            panel: "#eaf0f7",
+            text: "#131923",
+            muted: "#6b7786",
+            line: "rgba(19,25,35,.14)",
+            accent: "#f26f4a",
+            code: "#202833"
+          },
+          night: {
+            bg: "#0f171f",
+            panel: "#17212c",
+            text: "#f3f7fb",
+            muted: "#8190a1",
+            line: "rgba(255,255,255,.16)",
+            accent: "#ff8664",
+            code: "#d5dde7"
+          },
+          paper: {
+            bg: "#f4eee4",
+            panel: "#e9dfcf",
+            text: "#251e18",
+            muted: "#817264",
+            line: "rgba(54,38,24,.17)",
+            accent: "#d75e37",
+            code: "#342a22"
+          }
+        };
+        return themes[currentTheme()] || themes.glass;
+      }
+
+      function runtimeDocument({ body = "", css = "", script = "", title = "Preview" }) {
+        const theme = runnerTheme();
+        return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(title)}</title>
+  ${consoleHook()}
+  <style>
+    :root {
+      color-scheme: ${currentTheme() === "night" ? "dark" : "light"};
+      --bg: ${theme.bg};
+      --panel: ${theme.panel};
+      --text: ${theme.text};
+      --muted: ${theme.muted};
+      --line: ${theme.line};
+      --accent: ${theme.accent};
+      --code: ${theme.code};
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Arial, "PingFang SC", sans-serif;
+    }
+    .lumon-runner {
+      min-height: 100vh;
+      padding: clamp(24px, 6vw, 64px);
+    }
+    .runner-meta {
+      color: var(--muted);
+      font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .runner-title {
+      margin: 12px 0 22px;
+      font-size: clamp(34px, 8vw, 74px);
+      line-height: .95;
+    }
+    .runner-card {
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+    .runner-code {
+      max-height: 54vh;
+      margin: 0;
+      padding: 16px;
+      overflow: auto;
+      color: var(--code);
+      background: color-mix(in srgb, var(--panel) 75%, var(--bg));
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .runner-badge {
+      display: inline-flex;
+      padding: 4px 8px;
+      color: #10120d;
+      background: var(--accent);
+      border-radius: 99px;
+      font: 700 9px/1 ui-monospace, monospace;
+    }
+    .runner-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .runner-note code {
+      padding: 2px 5px;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+    }
+    ${safeRuntimeStyle(css)}
+  </style>
+</head>
+<body>
+  ${body}
+  ${script ? `<script>${safeRuntimeScript(script)}<\/script>` : ""}
+</body>
+</html>`;
+      }
+
+      function simpleMarkdown(value) {
+        const escaped = escapeHtml(value);
+        const blocks = [];
+        let output = escaped.replace(/```([\w-]*)\n([\s\S]*?)```/g, (_, language, code) => {
+          const index = blocks.length;
+          blocks.push(`<pre class="runner-code"><code>${code.trim()}</code></pre>`);
+          return `\n@@CODE_BLOCK_${index}@@\n`;
+        });
+        output = output
+          .replace(/^######\s+(.+)$/gm, "<h6>$1</h6>")
+          .replace(/^#####\s+(.+)$/gm, "<h5>$1</h5>")
+          .replace(/^####\s+(.+)$/gm, "<h4>$1</h4>")
+          .replace(/^###\s+(.+)$/gm, "<h3>$1</h3>")
+          .replace(/^##\s+(.+)$/gm, "<h2>$1</h2>")
+          .replace(/^#\s+(.+)$/gm, "<h1>$1</h1>")
+          .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+          .replace(/`([^`]+)`/g, "<code>$1</code>")
+          .replace(/^\s*[-*]\s+(.+)$/gm, "<li>$1</li>")
+          .replace(/\n{2,}/g, "</p><p>")
+          .replace(/\n/g, "<br>");
+        output = `<p>${output}</p>`
+          .replace(/(<li>.*?<\/li>)(?:<br>)?/g, "<ul>$1</ul>")
+          .replace(/@@CODE_BLOCK_(\d+)@@/g, (_, index) => blocks[Number(index)] || "");
+        return output;
+      }
+
+      function showRuntimeState(title, detail) {
+        const state = $("#runtimeState");
+        state.hidden = false;
+        state.innerHTML = "<strong></strong><span></span>";
+        $("strong", state).textContent = title;
+        $("span", state).textContent = detail;
+      }
+
+      function unsupportedRunner(file, detail) {
+        const preview = String(file.content).split("\n").slice(0, 120).join("\n");
+        return runtimeDocument({
+          title: basename(file.path),
+          body: `
+            <main class="lumon-runner">
+              <span class="runner-badge">${escapeHtml(languageLabel(languageFor(file.path)))}</span>
+              <h1 class="runner-title">${escapeHtml(basename(file.path))}</h1>
+              <p class="runner-note">${escapeHtml(detail)}</p>
+              <pre class="runner-code">${escapeHtml(preview)}</pre>
+            </main>
+          `
+        });
+      }
+
+      async function transpileTypeScript(file) {
+        if (!monaco?.languages?.typescript?.getTypeScriptWorker) {
+          throw new Error("TypeScript Worker 不可用");
         }
-        if (!htmlFile) {
-          setPreviewVisible(true);
-          setPreviewTab("preview");
-          $("#runtimeState").hidden = false;
-          $("#runtimeState").innerHTML = "<strong>没有 HTML 入口</strong><span>新建一个 index.html 或打开 HTML 文件</span>";
-          showToast("当前工作区没有可运行的 HTML 文件");
+        const model = modelForFile(file);
+        const workerFactory = await monaco.languages.typescript.getTypeScriptWorker();
+        const worker = await workerFactory(model.uri);
+        const output = await worker.getEmitOutput(model.uri.toString());
+        const emitted = output?.outputFiles?.find((item) => item.name.endsWith(".js"));
+        if (!emitted?.text) throw new Error("TypeScript 没有生成可执行的 JavaScript");
+        return emitted.text;
+      }
+
+      async function runCloudFile(file) {
+        const runtime = CLOUD_RUNTIMES[languageFor(file.path)];
+        if (!runtime) return false;
+        if (!cloud?.execution?.run) {
+          throw new Error("云端代码运行器尚未连接");
+        }
+        const button = $("#executionRun");
+        button.disabled = true;
+        const provider = $("#executionProvider").value || "auto";
+        $("#executionRuntime").textContent = `${provider.toUpperCase()} / ${runtime.label}`;
+        $("#executionStatus").textContent = "正在运行";
+        setPreviewVisible(true);
+        setPreviewTab("console");
+        try {
+          const result = await cloud.execution.run({
+            language: runtime.language,
+            content: file.content,
+            stdin: $("#executionInput").value,
+            provider
+          });
+          if (result.compileOutput) {
+            addConsole(result.compileCode ? "error" : "info", result.compileOutput);
+          }
+          if (result.stdout) addConsole("log", result.stdout);
+          if (result.stderr) {
+            addConsole(result.exitCode === 0 ? "warn" : "error", result.stderr);
+          }
+          if (!result.stdout && !result.stderr && !result.compileOutput) {
+            addConsole("info", "程序运行完成，没有输出。");
+          }
+          addConsole(
+            result.exitCode === 0 ? "info" : "error",
+            `进程结束 · exit ${result.exitCode}${result.signal ? ` · ${result.signal}` : ""}`
+          );
+          $("#executionRuntime").textContent = `${String(result.provider || provider).toUpperCase()} / ${runtime.label}`;
+          $("#executionStatus").textContent = result.exitCode === 0 ? "运行完成" : `退出码 ${result.exitCode}`;
+          showToast(`${file.path} 运行完成`);
+        } catch (error) {
+          const rawMessage = error.message || String(error);
+          const networkFailure = /fetch failed|failed to fetch|network|无法连接/i.test(rawMessage);
+          const message = networkFailure
+            ? `${rawMessage}。自动模式会先尝试本机编译器；如果本机缺少对应工具，再连接 Wandbox。请检查网络，或安装 Python/GCC 等本地工具后选择“本地”。`
+            : rawMessage;
+          addConsole("error", message);
+          $("#executionStatus").textContent = networkFailure ? "执行器连接失败" : "运行失败";
+          showToast(networkFailure ? "本地工具和远程执行器均不可用" : `运行失败：${rawMessage}`);
+        } finally {
+          button.disabled = false;
+        }
+        return true;
+      }
+
+      function syncExecutionProviderNotice() {
+        const provider = $("#executionProvider").value;
+        const notice = $("#executionPrivacy");
+        notice.classList.toggle("is-remote", provider !== "local");
+        if (provider === "local") {
+          notice.textContent = "本地模式：代码只会在这台电脑上编译和运行。";
+        } else if (provider === "auto") {
+          notice.textContent = "自动模式：本机缺少编译器时，代码会发送给第三方 Wandbox。";
+        } else {
+          notice.textContent = "第三方在线模式：代码和 stdin 会发送给 Wandbox 公共编译服务。";
+        }
+      }
+
+      async function confirmThirdPartyExecution(provider) {
+        if (provider === "local") return true;
+        let accepted = false;
+        try {
+          accepted = sessionStorage.getItem("lumon.studio.wandbox-consent.v1") === "yes";
+        } catch {}
+        if (accepted) return true;
+        const confirmed = await askConfirm(
+          "使用第三方在线编译",
+          "代码和标准输入将发送到 Wandbox 公共编译服务。不要运行包含密码、密钥、个人隐私或公司内部代码的内容。本次浏览器会话中确认一次即可。"
+        );
+        if (confirmed) {
+          try {
+            sessionStorage.setItem("lumon.studio.wandbox-consent.v1", "yes");
+          } catch {}
+        }
+        return confirmed;
+      }
+
+      async function diagnoseExecutionEnvironment() {
+        const button = $("#executionDiagnostics");
+        if (!cloud?.execution?.status) {
+          showToast("当前 API 客户端不支持执行环境检测");
           return;
         }
+        button.disabled = true;
+        setPreviewVisible(true);
+        setPreviewTab("console");
+        $("#executionStatus").textContent = "正在检测执行环境";
+        addConsole("info", "正在检测本地工具、Wandbox 和 Piston…");
+        try {
+          const result = await cloud.execution.status(true);
+          if (result.provider === "cloudflare" || result.local === false) {
+            addConsole("info", "本地执行：Cloudflare 线上环境不可用，请使用 Wandbox 或自动模式。");
+          } else {
+            const entries = Object.entries(result.local || {});
+            const available = entries.filter(([, value]) => value).map(([key]) => key);
+            const missing = entries.filter(([, value]) => !value).map(([key]) => key);
+            addConsole(
+              "info",
+              `本地可用：${available.length ? available.join(", ") : "无"}`
+            );
+            if (missing.length) {
+              addConsole("warn", `本地缺少：${missing.join(", ")}`);
+            }
+          }
+          addConsole(
+            result.remote?.wandbox ? "info" : "warn",
+            `Wandbox 第三方在线服务：${result.remote?.wandbox ? "连接正常" : "无法连接"}`
+          );
+          addConsole(
+            result.remote?.piston ? "info" : "warn",
+            `Piston 回退：${result.remote?.piston ? "连接正常" : "无法连接"}`
+          );
+          $("#executionStatus").textContent = "环境检测完成";
+        } catch (error) {
+          addConsole("error", `环境检测失败：${error.message || error}`);
+          $("#executionStatus").textContent = "环境检测失败";
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function runActiveFile() {
+        if (!workspace) return;
+        if (!activePath) {
+          setPreviewVisible(true);
+          setPreviewTab("preview");
+          showRuntimeState("没有打开文件", "请先选择要运行的文件");
+          showToast("请先打开一个文件");
+          return;
+        }
+        const file = findFile(activePath);
+        if (!file) {
+          showRuntimeState("文件不存在", activePath);
+          return;
+        }
+
         $("#consoleOutput").replaceChildren();
         problemCount = 0;
         runtimeMessageCount = 0;
         $("#problemStatus").textContent = "0 errors";
-        addConsole("info", `Running ${htmlFile.path}`);
+        $("#runtimeState").hidden = true;
+        $("#previewFrame").srcdoc = "";
+        setPreviewVisible(true);
+        setPreviewTab("preview");
+        addConsole("info", `Running ${file.path} · ${languageLabel(languageFor(file.path))}`);
+
         try {
-          $("#previewFrame").srcdoc = buildPreviewHtml(htmlFile);
+          const ext = extension(file.path);
+          const cloudRuntime = CLOUD_RUNTIMES[languageFor(file.path)];
+          if (cloudRuntime) {
+            const provider = $("#executionProvider").value || "auto";
+            const confirmed = await confirmThirdPartyExecution(provider);
+            if (!confirmed) {
+              $("#executionStatus").textContent = "已取消在线编译";
+              addConsole("warn", "已取消。代码没有发送到第三方服务。");
+              setPreviewTab("console");
+              return;
+            }
+            await runCloudFile(file);
+            return;
+          }
+          $("#executionRuntime").textContent = `LOCAL / ${languageLabel(languageFor(file.path))}`;
+          $("#executionStatus").textContent = "等待运行";
+          let html = "";
+          if (ext === "html" || ext === "htm") {
+            html = buildPreviewHtml(file);
+          } else if (["css", "scss", "less"].includes(ext)) {
+            html = runtimeDocument({
+              title: basename(file.path),
+              css: file.content,
+              body: `
+                <main class="lumon-runner">
+                  <span class="runner-badge">STYLE RUNNER</span>
+                  <h1 class="runner-title">${escapeHtml(basename(file.path))}</h1>
+                  <p class="runner-note">当前样式已应用到这段测试页面。</p>
+                  <section class="runner-card">
+                    <h2>Style preview</h2>
+                    <p>文本、按钮与容器会使用当前文件中的 CSS。</p>
+                    <button type="button">Example button</button>
+                  </section>
+                </main>
+              `
+            });
+          } else if (ext === "js" || ext === "mjs" || ext === "cjs") {
+            html = runtimeDocument({
+              title: basename(file.path),
+              script: file.content,
+              body: `
+                <main class="lumon-runner">
+                  <span class="runner-badge">JAVASCRIPT</span>
+                  <h1 class="runner-title">${escapeHtml(basename(file.path))}</h1>
+                  <p class="runner-note">当前 JavaScript 文件正在隔离沙箱中运行，控制台输出会显示在 IDE 控制台。</p>
+                </main>
+              `
+            });
+          } else if (["ts", "tsx", "jsx"].includes(ext)) {
+            const output = await transpileTypeScript(file);
+            html = runtimeDocument({
+              title: basename(file.path),
+              script: output,
+              body: `
+                <main class="lumon-runner">
+                  <span class="runner-badge">${escapeHtml(languageLabel(languageFor(file.path)))}</span>
+                  <h1 class="runner-title">${escapeHtml(basename(file.path))}</h1>
+                  <p class="runner-note">TypeScript 已由 Monaco Worker 编译为 JavaScript 并在沙箱中运行。</p>
+                </main>
+              `
+            });
+          } else if (ext === "json" || ext === "jsonc") {
+            let parsed;
+            try {
+              parsed = JSON.parse(file.content);
+            } catch (error) {
+              throw new Error(`JSON 格式错误：${error.message}`);
+            }
+            html = runtimeDocument({
+              title: basename(file.path),
+              body: `
+                <main class="lumon-runner">
+                  <span class="runner-badge">JSON</span>
+                  <h1 class="runner-title">${escapeHtml(basename(file.path))}</h1>
+                  <pre class="runner-code">${escapeHtml(JSON.stringify(parsed, null, 2))}</pre>
+                </main>
+              `
+            });
+          } else if (ext === "md" || ext === "markdown") {
+            html = runtimeDocument({
+              title: basename(file.path),
+              css: ".lumon-runner p,.lumon-runner li{line-height:1.8}.lumon-runner code{padding:2px 5px;border:1px solid var(--line);border-radius:3px}",
+              body: `<main class="lumon-runner"><span class="runner-badge">MARKDOWN</span>${simpleMarkdown(file.content)}</main>`
+            });
+          } else if (ext === "svg") {
+            html = runtimeDocument({
+              title: basename(file.path),
+              body: `<main class="lumon-runner"><span class="runner-badge">SVG</span><div class="runner-card">${file.content}</div></main>`
+            });
+          } else {
+            const language = languageLabel(languageFor(file.path));
+            html = unsupportedRunner(
+              file,
+              `${language} 当前没有浏览器执行运行时。这里显示的是你刚选择的文件内容，而不是 index.html。可以使用编辑器进行语法高亮和本地保存。`
+            );
+            addConsole("warn", `${language} 暂不支持浏览器直接执行`);
+          }
+
+          $("#previewFrame").srcdoc = html;
           $("#runtimeState").hidden = true;
-          setPreviewVisible(true);
           setPreviewTab("preview");
-          showToast(`正在运行 ${htmlFile.path}`);
+          showToast(`正在运行 ${file.path}`);
         } catch (error) {
-          $("#runtimeState").hidden = false;
-          $("#runtimeState").innerHTML = "<strong>运行失败</strong><span></span>";
-          $("#runtimeState span").textContent = String(error.message || error);
+          showRuntimeState("运行失败", String(error.message || error));
           addConsole("error", error.message || error);
           setPreviewTab("console");
         }
@@ -3150,12 +3780,12 @@ button.addEventListener("click", () => {
             }
           },
           {
-            title: "运行当前项目",
-            detail: "构建 HTML 并在沙箱中预览",
+            title: "运行当前文件",
+            detail: "运行当前标签页对应的文件",
             icon: "i-play",
             shortcut: "Ctrl Enter",
             keywords: "run preview browser",
-            action: runPreview
+            action: runActiveFile
           },
           {
             title: "快速打开文件",
@@ -3185,9 +3815,9 @@ button.addEventListener("click", () => {
           },
           {
             title: "切换界面主题",
-            detail: "在深色和浅色主题之间切换",
+            detail: "在流体玻璃、午夜实验室和暖纸工作室之间切换",
             icon: "i-moon",
-            keywords: "theme dark light",
+            keywords: "theme glass night paper dark light 主题",
             action: toggleTheme
           },
           {
@@ -3320,21 +3950,47 @@ button.addEventListener("click", () => {
       }
 
       function currentTheme() {
-        return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+        const theme = document.documentElement.dataset.theme;
+        return ["glass", "night", "paper"].includes(theme) ? theme : "glass";
       }
 
-      function applyTheme(theme) {
-        const next = theme === "light" ? "light" : "dark";
-        document.documentElement.dataset.theme = next;
-        safeStorageSet(THEME_KEY, next);
+      function applyTheme(theme, persist = true) {
+        const next = ["glass", "night", "paper"].includes(theme) ? theme : "glass";
+        if (persist && window.PellosyTheme) {
+          window.PellosyTheme.set(next);
+        } else {
+          document.documentElement.dataset.theme = next;
+        }
+        const names = window.PellosyTheme?.names || {
+          glass: "流体玻璃",
+          night: "午夜实验室",
+          paper: "暖纸工作室"
+        };
         const meta = $('meta[name="theme-color"]');
-        if (meta) meta.content = next === "light" ? "#e9e9e2" : "#0b0c0a";
-        $("#themeButton").setAttribute("aria-label", next === "light" ? "切换到深色主题" : "切换到浅色主题");
-        if (monaco) monaco.editor.setTheme(next === "light" ? "lumon-light" : "lumon-dark");
+        if (meta) {
+          meta.content = next === "night"
+            ? "#0b1118"
+            : next === "paper"
+              ? "#e9dfcf"
+              : "#e8eef5";
+        }
+        $("#themeButton").setAttribute("aria-label", `当前主题：${names[next]}，点击切换`);
+        $("#themeButton").title = names[next];
+        $("#themeButton use").setAttribute("href", next === "night" ? "#i-sun" : "#i-moon");
+        if (monaco) {
+          monaco.editor.setTheme(
+            next === "night" ? "lumon-dark" : next === "paper" ? "lumon-paper" : "lumon-light"
+          );
+        }
       }
 
       function toggleTheme() {
-        applyTheme(currentTheme() === "dark" ? "light" : "dark");
+        if (window.PellosyTheme) {
+          window.PellosyTheme.cycle();
+          return;
+        }
+        const order = ["glass", "night", "paper"];
+        applyTheme(order[(order.indexOf(currentTheme()) + 1) % order.length]);
       }
 
       function defineThemes() {
@@ -3343,7 +3999,7 @@ button.addEventListener("click", () => {
           inherit: true,
           rules: [
             { token: "comment", foreground: "737970", fontStyle: "italic" },
-            { token: "keyword", foreground: "d8ff00" },
+            { token: "keyword", foreground: "ff8664" },
             { token: "string", foreground: "8fd7a2" },
             { token: "number", foreground: "ffae6a" },
             { token: "type", foreground: "78a9ff" },
@@ -3353,26 +4009,26 @@ button.addEventListener("click", () => {
             { token: "attribute.name", foreground: "78a9ff" }
           ],
           colors: {
-            "editor.background": "#0e100d",
-            "editor.foreground": "#e8e9e2",
-            "editorLineNumber.foreground": "#454a42",
-            "editorLineNumber.activeForeground": "#a7ada1",
-            "editorCursor.foreground": "#d8ff00",
-            "editor.selectionBackground": "#33400088",
-            "editor.inactiveSelectionBackground": "#26300066",
+            "editor.background": "#0f171f",
+            "editor.foreground": "#f3f7fb",
+            "editorLineNumber.foreground": "#526273",
+            "editorLineNumber.activeForeground": "#9caabc",
+            "editorCursor.foreground": "#ff8664",
+            "editor.selectionBackground": "#ff866444",
+            "editor.inactiveSelectionBackground": "#ff866420",
             "editor.lineHighlightBackground": "#ffffff06",
             "editorIndentGuide.background1": "#ffffff0b",
-            "editorIndentGuide.activeBackground1": "#d8ff0044",
-            "editorWidget.background": "#161914",
+            "editorIndentGuide.activeBackground1": "#ff866444",
+            "editorWidget.background": "#17212c",
             "editorWidget.border": "#ffffff1a",
-            "editorSuggestWidget.background": "#161914",
-            "editorSuggestWidget.selectedBackground": "#2a3025",
-            "editorHoverWidget.background": "#161914",
+            "editorSuggestWidget.background": "#17212c",
+            "editorSuggestWidget.selectedBackground": "#263546",
+            "editorHoverWidget.background": "#17212c",
             "editorHoverWidget.border": "#ffffff1a",
-            "minimap.background": "#0e100d",
+            "minimap.background": "#0f171f",
             "scrollbarSlider.background": "#ffffff18",
             "scrollbarSlider.hoverBackground": "#ffffff28",
-            "scrollbarSlider.activeBackground": "#d8ff0055"
+            "scrollbarSlider.activeBackground": "#ff866455"
           }
         });
         monaco.editor.defineTheme("lumon-light", {
@@ -3388,22 +4044,53 @@ button.addEventListener("click", () => {
             { token: "attribute.name", foreground: "3157d8" }
           ],
           colors: {
-            "editor.background": "#f8f8f3",
-            "editor.foreground": "#171913",
-            "editorLineNumber.foreground": "#adb0a6",
-            "editorLineNumber.activeForeground": "#4d5148",
-            "editorCursor.foreground": "#5f7300",
-            "editor.selectionBackground": "#cbe76c66",
-            "editor.inactiveSelectionBackground": "#dce4c366",
+            "editor.background": "#f6f8fb",
+            "editor.foreground": "#131923",
+            "editorLineNumber.foreground": "#aab4c1",
+            "editorLineNumber.activeForeground": "#425064",
+            "editorCursor.foreground": "#f26f4a",
+            "editor.selectionBackground": "#f26f4a38",
+            "editor.inactiveSelectionBackground": "#f26f4a20",
             "editor.lineHighlightBackground": "#00000005",
             "editorIndentGuide.background1": "#00000010",
-            "editorIndentGuide.activeBackground1": "#91ad1744",
-            "editorWidget.background": "#f3f3ed",
+            "editorIndentGuide.activeBackground1": "#f26f4a44",
+            "editorWidget.background": "#eef3f9",
             "editorWidget.border": "#0000001c",
-            "editorSuggestWidget.background": "#f3f3ed",
-            "editorSuggestWidget.selectedBackground": "#e0e4d4",
-            "editorHoverWidget.background": "#f3f3ed",
-            "minimap.background": "#f8f8f3"
+            "editorSuggestWidget.background": "#eef3f9",
+            "editorSuggestWidget.selectedBackground": "#dfe8f3",
+            "editorHoverWidget.background": "#eef3f9",
+            "minimap.background": "#f6f8fb"
+          }
+        });
+        monaco.editor.defineTheme("lumon-paper", {
+          base: "vs",
+          inherit: true,
+          rules: [
+            { token: "comment", foreground: "817264", fontStyle: "italic" },
+            { token: "keyword", foreground: "a64525" },
+            { token: "string", foreground: "527237" },
+            { token: "number", foreground: "b05b22" },
+            { token: "type", foreground: "4264b2" },
+            { token: "tag", foreground: "a7470c" },
+            { token: "attribute.name", foreground: "4264b2" }
+          ],
+          colors: {
+            "editor.background": "#f4eee4",
+            "editor.foreground": "#251e18",
+            "editorLineNumber.foreground": "#b3a596",
+            "editorLineNumber.activeForeground": "#574a3e",
+            "editorCursor.foreground": "#d75e37",
+            "editor.selectionBackground": "#d75e3733",
+            "editor.inactiveSelectionBackground": "#d75e371c",
+            "editor.lineHighlightBackground": "#4a351f08",
+            "editorIndentGuide.background1": "#4a351f14",
+            "editorIndentGuide.activeBackground1": "#d75e3744",
+            "editorWidget.background": "#eee5d7",
+            "editorWidget.border": "#4a351f24",
+            "editorSuggestWidget.background": "#eee5d7",
+            "editorSuggestWidget.selectedBackground": "#e2d4c0",
+            "editorHoverWidget.background": "#eee5d7",
+            "minimap.background": "#f4eee4"
           }
         });
       }
@@ -3411,7 +4098,11 @@ button.addEventListener("click", () => {
       function createEditor() {
         defineThemes();
         editor = monaco.editor.create($("#monacoEditor"), {
-          theme: currentTheme() === "light" ? "lumon-light" : "lumon-dark",
+          theme: currentTheme() === "night"
+            ? "lumon-dark"
+            : currentTheme() === "paper"
+              ? "lumon-paper"
+              : "lumon-light",
           automaticLayout: false,
           fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
           fontSize: 13,
@@ -3459,7 +4150,7 @@ button.addEventListener("click", () => {
           }
         });
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveActiveFile);
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runPreview);
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runActiveFile);
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyP, () => openPalette("files"));
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyP, () => openPalette("commands"));
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB, toggleSidebar);
@@ -3528,9 +4219,20 @@ button.addEventListener("click", () => {
       }
 
       function bindUi() {
+        const localHost = ["127.0.0.1", "localhost"].includes(location.hostname);
+        if (localHost) {
+          $("[data-home-link]").setAttribute("href", "index5.html");
+        } else {
+          $("#executionProvider").value = "wandbox";
+        }
+        syncExecutionProviderNotice();
+        $("#executionProvider").addEventListener("change", syncExecutionProviderNotice);
+        window.addEventListener("pellosy:theme-change", (event) => {
+          applyTheme(event.detail?.theme, false);
+        });
         $("#saveButton").addEventListener("click", saveActiveFile);
-        $("#runButton").addEventListener("click", runPreview);
-        $("#previewRefresh").addEventListener("click", runPreview);
+        $("#runButton").addEventListener("click", runActiveFile);
+        $("#previewRefresh").addEventListener("click", runActiveFile);
         $("#previewToggle").addEventListener("click", togglePreview);
         $("#mobilePreviewClose").addEventListener("click", () => setPreviewVisible(false));
         $("#themeButton").addEventListener("click", toggleTheme);
@@ -3570,6 +4272,11 @@ button.addEventListener("click", () => {
           problemCount = 0;
           $("#problemStatus").textContent = "0 errors";
         });
+        $("#executionForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          runActiveFile();
+        });
+        $("#executionDiagnostics").addEventListener("click", diagnoseExecutionEnvironment);
         $("#globalSearchInput").addEventListener("input", renderSearch);
         $("#importButton").addEventListener("click", () => $("#importInput").click());
         $("#exportButton").addEventListener("click", exportWorkspace);
@@ -3703,7 +4410,7 @@ button.addEventListener("click", () => {
             openPalette("files");
           } else if (event.key === "Enter") {
             event.preventDefault();
-            runPreview();
+            runActiveFile();
           } else if (event.key.toLowerCase() === "b") {
             event.preventDefault();
             toggleSidebar();
@@ -3720,7 +4427,7 @@ button.addEventListener("click", () => {
 
       async function boot() {
         try {
-          applyTheme(safeStorageGet(THEME_KEY) || "dark");
+          applyTheme(window.PellosyTheme?.get() || currentTheme(), false);
           bindUi();
           await guardSession();
           setBootMessage("正在加载 Monaco 编辑器");
