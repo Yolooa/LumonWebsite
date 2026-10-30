@@ -6,12 +6,9 @@ pages_build_output_dir = "."
 WANDBOX_API_URL = "https://wandbox.org/api"
 PISTON_API_URL = "https://emkc.org/api/v2/piston"
 
-# 生产环境的 D1 绑定在 Cloudflare Pages 后台管理：
-#   Settings -> Bindings -> D1 database
-# 绑定变量名必须使用 DB。
-#
-# 如果希望通过 Wrangler 管理绑定，取消下面配置的注释并填写数据库 ID：
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "lumonsky-db"
-# database_id = "<your-database-id>"
+# Cloudflare Pages 的 D1 绑定由本文件管理。
+# binding 名称必须是大写 DB。
+[[d1_databases]]
+binding = "DB"
+database_name = "lumonsky-db"
+database_id = "7d77af61-0302-4a14-a5b3-e2614fce86e0"
