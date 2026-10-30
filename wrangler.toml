@@ -1,0 +1,13 @@
+name = "lumonsky"
+compatibility_date = "2026-10-30"
+pages_build_output_dir = "."
+
+# 生产环境的 D1 绑定在 Cloudflare Pages 后台管理：
+#   Settings -> Bindings -> D1 database
+# 绑定变量名必须使用 DB。
+#
+# 如果希望通过 Wrangler 管理绑定，取消下面配置的注释并填写数据库 ID：
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "lumonsky-db"
+# database_id = "<your-database-id>"

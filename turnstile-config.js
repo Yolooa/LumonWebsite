@@ -18,7 +18,7 @@
 window.PELLOSY_TURNSTILE = Object.assign(
   {
     /* ← 把 Site Key 填这里，形如 "0x4AAAAAAAxxxxxxxxxxxxxxxx" */
-    siteKey: "0x4AAAAAAFWSytUxjxrP9y06",
+    siteKey: "0x4AAAAAAFsj2epOQMREpInS",
 
     /* 前端是否强制要求先通过验证 */
     enabled: true,

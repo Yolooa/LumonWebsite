@@ -1,119 +1,86 @@
-/*
- * login.js — 登录接口
- * ---------------------------------------------------------------------------
- * 流程：① Cloudflare Turnstile 人机验证 → ② 校验账号密码（D1 users 表）
- *
- * 需要的环境变量：
- *   TURNSTILE_SECRET_KEY（或旧的 SECRET_KEY）—— Turnstile 私钥
- *   DB                                   —— D1 绑定
- *
- * 前端提交：{ identifier | username, password, turnstileToken }
- */
-
 import { verifyTurnstile } from "./_turnstile.js";
-
-function json(data, status) {
-    return new Response(JSON.stringify(data), {
-        status: status || 200,
-        headers: {
-            "Content-Type": "application/json;charset=UTF-8",
-            "Access-Control-Allow-Origin": "*"
-        }
-    });
-}
+import {
+  ApiError,
+  cleanText,
+  createSessionResponse,
+  errorResponse,
+  json,
+  publicUser,
+  readJson,
+  requireDb,
+  requireMethod
+} from "./_shared.js";
+import { hashPassword, verifyPassword } from "./_security.js";
 
 export async function onRequest(context) {
-    const { request, env } = context;
-
-    if (request.method === "OPTIONS") {
-        return new Response(null, {
-            status: 204,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type"
-            }
-        });
-    }
-
-    if (request.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
-    }
-
-    let body;
-
-    try {
-        body = await request.json();
-    } catch {
-        return json({ success: false, code: "BAD_REQUEST", message: "请求体不是合法 JSON" }, 400);
-    }
-
-    /* ---------- ① 人机验证：没过验证一律不放行 ---------- */
-    const check = await verifyTurnstile(request, env, body.turnstileToken);
-
+  try {
+    requireMethod(context.request, "POST");
+    const body = await readJson(context.request);
+    const check = await verifyTurnstile(
+      context.request,
+      context.env,
+      body.turnstileToken
+    );
     if (!check.ok) {
-        return json(
-            { success: false, code: check.code, message: check.message, errors: check.errors || [] },
-            check.status || 403
-        );
+      return json(
+        { success: false, code: check.code, message: check.message, errors: check.errors || [] },
+        check.status || 403
+      );
     }
 
-    /* ---------- ② 账号校验 ---------- */
-    const identifier = String(body.identifier || body.username || "").trim();
+    const identifier = cleanText(body.identifier || body.username, 160);
     const password = String(body.password || "");
-
-    if (!identifier || !password) {
-        return json({ success: false, code: "BAD_REQUEST", message: "请填写账号和密码" }, 400);
+    if (!identifier) throw new ApiError("请填写用户名或邮箱", 400, "BAD_REQUEST");
+    if (!password || password.length > 256) {
+      throw new ApiError("密码格式不正确", 400, "INVALID_PASSWORD");
     }
 
-    const { DB } = env;
-
-    if (!DB) {
-        return json(
-            {
-                success: false,
-                code: "NO_DB_BOUND",
-                message: "服务端未绑定 D1 数据库（变量名 DB）"
-            },
-            500
-        );
-    }
-
+    const db = requireDb(context.env);
+    let row;
     try {
-        /*
-         * 兼容两种表结构：users(username,password) 与 users(username,email,password)。
-         * 注意：这里按明文比较，正式环境请改为 bcrypt 之类的哈希校验。
-         */
-        let user;
-
-        try {
-            user = await DB.prepare(
-                "SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?"
-            )
-                .bind(identifier, identifier, password)
-                .first();
-        } catch (columnErr) {
-            user = await DB.prepare(
-                "SELECT * FROM users WHERE username = ? AND password = ?"
-            )
-                .bind(identifier, password)
-                .first();
-        }
-
-        if (!user) {
-            return json(
-                { success: false, code: "BAD_CREDENTIALS", message: "用户名或密码错误" },
-                401
-            );
-        }
-
-        return json({
-            success: true,
-            message: "登录成功",
-            username: user.username,
-            email: user.email || ""
-        });
-    } catch (error) {
-        return json({ success: false, message: "服务器错误: " + error.message }, 500);
+      row = await db.prepare(
+        `SELECT id, username, email, display_name, password_hash
+         FROM users
+         WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE
+         LIMIT 1`
+      ).bind(identifier, identifier).first();
+    } catch {
+      row = await db.prepare(
+        `SELECT id, username, email, display_name, password AS password_hash
+         FROM users
+         WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE
+         LIMIT 1`
+      ).bind(identifier, identifier).first();
     }
+
+    if (!row) {
+      throw new ApiError("用户名或密码错误", 401, "BAD_CREDENTIALS");
+    }
+
+    const verification = await verifyPassword(password, row.password_hash);
+    if (!verification.ok) {
+      throw new ApiError("用户名或密码错误", 401, "BAD_CREDENTIALS");
+    }
+
+    if (verification.needsUpgrade) {
+      try {
+        const upgraded = await hashPassword(password);
+        await db.prepare(
+          "UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        ).bind(upgraded, row.id).run();
+      } catch {
+        // Existing installations are upgraded by the final D1 migration.
+      }
+    }
+
+    const user = publicUser(row);
+    const session = await createSessionResponse(user, context.env, body.remember !== false);
+    return json(
+      { success: true, user },
+      200,
+      { "Set-Cookie": session.cookie }
+    );
+  } catch (error) {
+    return errorResponse(error);
+  }
 }
