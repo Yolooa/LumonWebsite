@@ -5330,6 +5330,9 @@
       <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.4 9.4 0 0 1-4-.9L3 21l2-4.8a8.4 8.4 0 1 1 16-4.7Z"/>
       <path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01"/>
     </symbol>
+    <symbol id="i-code" viewBox="0 0 24 24">
+      <path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"/>
+    </symbol>
     <symbol id="i-palette" viewBox="0 0 24 24">
       <path d="M12 3a9 9 0 0 0 0 18h1.5a1.5 1.5 0 0 0 0-3H12a2 2 0 0 1 0-4h6.5A2.5 2.5 0 0 0 21 11.5 9 9 0 0 0 12 3Z"/>
       <circle cx="7.5" cy="10.5" r=".75" fill="currentColor" stroke="none"/>
@@ -5512,6 +5515,10 @@
         <a class="icon-button message-trigger" id="messageTrigger" href="messagessend.html" aria-label="打开私信" data-tooltip="私信" data-magnetic>
           <svg class="icon"><use href="#i-message-circle"></use></svg>
           <span>私信</span>
+        </a>
+
+        <a class="icon-button" href="ide.html" aria-label="打开 Lumon Studio IDE" data-tooltip="IDE" data-magnetic>
+          <svg class="icon"><use href="#i-code"></use></svg>
         </a>
 
         <button class="icon-button command-trigger" id="commandTrigger" type="button" aria-label="打开命令面板" data-tooltip="命令面板" data-magnetic>
@@ -8606,6 +8613,18 @@
           action: () => {
             closeCommand();
             transitionTo("messagessend.html", "PELLOSY MESSAGES");
+          }
+        },
+        {
+          group: "Navigate",
+          title: "Lumon Studio IDE",
+          detail: "打开多语言开发工作区",
+          icon: "code",
+          key: "D",
+          keywords: "ide code editor workspace monaco 开发 编辑器",
+          action: () => {
+            closeCommand();
+            transitionTo("ide.html", "LUMON STUDIO");
           }
         },
         {

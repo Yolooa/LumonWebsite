@@ -68,6 +68,58 @@
       mask-image: linear-gradient(120deg, #000, transparent 78%);
     }
 
+    .chat-background {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .chat-motif {
+      position: absolute;
+      display: block;
+      width: min(22vw, 320px);
+      height: auto;
+      object-fit: contain;
+      opacity: var(--motif-opacity, 0.16);
+      filter: grayscale(1) contrast(1.35);
+      mix-blend-mode: multiply;
+      will-change: transform;
+    }
+
+    .chat-motif-group-a {
+      left: 1.4vw;
+      top: 17vh;
+      --motif-opacity: 0.2;
+      transform: rotate(-12deg);
+      animation:
+        motifRevealA 1.2s 0.34s var(--ease) both,
+        motifFloatA 24s 1.35s ease-in-out infinite;
+    }
+
+    .chat-motif-user-a {
+      right: 0.7vw;
+      bottom: -1vh;
+      width: min(19vw, 280px);
+      --motif-opacity: 0.16;
+      transform: rotate(9deg);
+      animation:
+        motifRevealB 1.2s 0.46s var(--ease) both,
+        motifFloatB 29s 1.5s ease-in-out infinite;
+    }
+
+    .chat-motif-group-b {
+      left: 53%;
+      bottom: -9vh;
+      width: min(14vw, 190px);
+      --motif-opacity: 0.13;
+      transform: rotate(-3deg);
+      animation:
+        motifRevealC 1.1s 0.58s var(--ease) both,
+        motifFloatC 33s 1.65s ease-in-out infinite;
+    }
+
     button,
     textarea,
     input {
@@ -92,6 +144,8 @@
     }
 
     .app {
+      position: relative;
+      z-index: 2;
       width: min(100% - 32px, 1500px);
       height: 100vh;
       margin: 0 auto;
@@ -1209,6 +1263,39 @@
       to { transform: translateX(160%); }
     }
 
+    @keyframes motifRevealA {
+      from { opacity: 0; transform: translate(-26px, 34px) rotate(-4deg) scale(0.92); }
+      to { opacity: var(--motif-opacity); transform: translate(0, 0) rotate(-12deg) scale(1); }
+    }
+
+    @keyframes motifRevealB {
+      from { opacity: 0; transform: translate(30px, 26px) rotate(17deg) scale(0.9); }
+      to { opacity: var(--motif-opacity); transform: translate(0, 0) rotate(9deg) scale(1); }
+    }
+
+    @keyframes motifRevealC {
+      from { opacity: 0; transform: translateY(24px) rotate(5deg) scale(0.88); }
+      to { opacity: var(--motif-opacity); transform: translateY(0) rotate(-3deg) scale(1); }
+    }
+
+    @keyframes motifFloatA {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(-12deg); }
+      38% { transform: translate3d(18px, -24px, 0) rotate(-6deg); }
+      72% { transform: translate3d(-8px, -10px, 0) rotate(-16deg); }
+    }
+
+    @keyframes motifFloatB {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(9deg); }
+      42% { transform: translate3d(-17px, -27px, 0) rotate(14deg); }
+      74% { transform: translate3d(7px, -9px, 0) rotate(4deg); }
+    }
+
+    @keyframes motifFloatC {
+      0%, 100% { transform: translate3d(0, 0, 0) rotate(-3deg); }
+      46% { transform: translate3d(19px, 16px, 0) rotate(5deg); }
+      76% { transform: translate3d(-9px, 7px, 0) rotate(-8deg); }
+    }
+
     @keyframes headerDrop {
       from { opacity: 0; transform: translateY(-14px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1345,6 +1432,27 @@
         max-width: 85%;
       }
 
+      .chat-motif-group-a {
+        left: -42px;
+        top: 15vh;
+        width: 132px;
+        --motif-opacity: 0.11;
+      }
+
+      .chat-motif-user-a {
+        right: -35px;
+        bottom: 5vh;
+        width: 118px;
+        --motif-opacity: 0.1;
+      }
+
+      .chat-motif-group-b {
+        left: 48%;
+        bottom: -44px;
+        width: 96px;
+        --motif-opacity: 0.075;
+      }
+
       dialog {
         width: calc(100vw - 16px);
       }
@@ -1385,6 +1493,12 @@
       <strong>正在验证私聊空间</strong>
       <span class="gate-line" aria-hidden="true"></span>
     </div>
+  </div>
+
+  <div class="chat-background" aria-hidden="true">
+    <img class="chat-motif chat-motif-group-a" src="assets/people_group_icon_188185.svg?v=2" alt="">
+    <img class="chat-motif chat-motif-user-a" src="assets/user-512x512.png?v=2" alt="">
+    <img class="chat-motif chat-motif-group-b" src="assets/people_group_icon_188185.svg?v=2" alt="">
   </div>
 
   <div class="app">
