@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f1f0eb">
+  <meta name="description" content="Pellosy Cloudflare account access">
+  <title>账户 / Pellosy</title>
+  <style>
+    :root {
+      --paper: #f1f0eb;
+      --ink: #080808;
+      --muted: #666762;
+      --line: rgba(8, 8, 8, 0.18);
+      --yellow: #e5ff00;
+      --silver: #b9bfbd;
+      --white: #fafaf7;
+      --danger: #c7332b;
+      --success: #557d1a;
+      --sans: "Google Sans Flex", "Helvetica Neue", Helvetica, Arial,
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      --serif: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-width: 320px;
+      background: var(--paper);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "ACCOUNT";
+      position: fixed;
+      left: -4vw;
+      top: 8vh;
+      z-index: -3;
+      color: transparent;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(150px, 27vw, 420px);
+      font-weight: 900;
+      line-height: 0.8;
+      -webkit-text-stroke: 1px rgba(8, 8, 8, 0.08);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.075;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    button,
+    input {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    .stage {
+      position: relative;
+      width: min(100% - 48px, 1440px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 16px 0 24px;
+    }
+
+    .background-lines {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .background-lines::before,
+    .background-lines::after {
+      content: "";
+      position: absolute;
+      width: 62vw;
+      height: 32vw;
+      border: 1px solid rgba(8, 8, 8, 0.17);
+      border-radius: 50%;
+      transform: rotate(-18deg);
+    }
+
+    .background-lines::before {
+      right: -12vw;
+      top: 7vh;
+      box-shadow:
+        0 0 0 28px rgba(8, 8, 8, 0.018),
+        0 0 0 72px rgba(8, 8, 8, 0.012);
+    }
+
+    .background-lines::after {
+      left: 24vw;
+      bottom: -16vw;
+      border-color: rgba(8, 8, 8, 0.1);
+    }
+
+    .yellow-shard {
+      position: fixed;
+      left: 52%;
+      top: -9vh;
+      z-index: -1;
+      width: clamp(90px, 12vw, 190px);
+      height: clamp(180px, 24vw, 360px);
+      background: var(--yellow);
+      transform: rotate(35deg);
+      pointer-events: none;
+    }
+
+    .site-header {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: #fff;
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+
+    .header-links {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .header-link {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.66);
+      border-radius: 999px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      font-size: 9px;
+      font-weight: 600;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .header-link:hover {
+      background: var(--yellow);
+      transform: translateY(-1px);
+    }
+
+    .account-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.12fr) minmax(390px, 0.68fr);
+      align-items: end;
+      gap: clamp(40px, 6vw, 100px);
+      min-height: calc(100vh - 114px);
+      padding: clamp(70px, 10vh, 130px) 0 35px;
+    }
+
+    .account-intro {
+      align-self: center;
+      padding-bottom: 30px;
+    }
+
+    .intro-label {
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+
+    .account-intro h1 {
+      max-width: 820px;
+      font-family: "Arial Black", "Helvetica Neue", Arial, sans-serif;
+      font-size: clamp(58px, 7.1vw, 112px);
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 0.84;
+      text-transform: uppercase;
+    }
+
+    .account-intro h1 span {
+      display: block;
+      width: max-content;
+      max-width: 100%;
+      margin-top: 0.12em;
+      padding: 0.04em 0.1em 0.09em;
+      background: var(--yellow);
+      font-size: 0.68em;
+      line-height: 0.95;
+    }
+
+    .account-intro > p {
+      max-width: 530px;
+      margin-top: 27px;
+      padding-top: 15px;
+      color: #454640;
+      border-top: 1px solid rgba(8, 8, 8, 0.48);
+      font-family: var(--serif);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .cloud-map {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      max-width: 540px;
+      margin-top: 28px;
+    }
+
+    .cloud-map span {
+      padding: 8px 9px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 7px;
+      text-align: center;
+    }
+
+    .account-card {
+      position: relative;
+      overflow: hidden;
+      background: rgba(250, 250, 247, 0.68);
+      border: 1px solid rgba(8, 8, 8, 0.42);
+      border-radius: 8px;
+      backdrop-filter: blur(28px) saturate(150%);
+      -webkit-backdrop-filter: blur(28px) saturate(150%);
+      box-shadow: 0 22px 60px rgba(17, 18, 15, 0.13);
+      animation: cardIn 0.8s var(--ease) both;
+    }
+
+    .account-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(130deg,
+          rgba(255, 255, 255, 0.4),
+          transparent 34% 70%,
+          rgba(255, 255, 255, 0.18));
+    }
+
+    .card-head {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .card-head span:first-child {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .cloud-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .cloud-state::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #8c8e87;
+      border-radius: 50%;
+    }
+
+    .cloud-state.is-online {
+      color: var(--success);
+    }
+
+    .cloud-state.is-online::before {
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(85, 125, 26, 0.12);
+    }
+
+    .auth-tabs {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      margin: 16px 22px 0;
+      padding: 4px;
+      background: rgba(8, 8, 8, 0.055);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .auth-tab {
+      min-height: 34px;
+      color: var(--muted);
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 650;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .auth-tab[aria-selected="true"] {
+      color: var(--paper);
+      background: var(--ink);
+    }
+
+    .auth-view {
+      position: relative;
+      padding: 23px 22px 24px;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 13px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 650;
+      letter-spacing: 0.05em;
+    }
+
+    .field input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      font-size: 12px;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .field input:focus {
+      background: rgba(255, 255, 255, 0.72);
+      border-color: var(--ink);
+      box-shadow: 0 0 0 3px rgba(229, 255, 0, 0.42);
+    }
+
+    .field input::placeholder {
+      color: #999b93;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 8px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+    }
+
+    .check input {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--ink);
+    }
+
+    .turnstile-slot {
+      min-height: 58px;
+      padding: 7px 0;
+    }
+
+    .turnstile-note,
+    .form-status {
+      min-height: 14px;
+      color: var(--muted);
+      font-size: 8px;
+      line-height: 1.55;
+    }
+
+    .turnstile-note.is-error,
+    .form-status.is-error {
+      color: var(--danger);
+    }
+
+    .turnstile-note.is-ok,
+    .form-status.is-success {
+      color: var(--success);
+    }
+
+    .submit-button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--paper);
+      background: var(--ink);
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 650;
+      transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .submit-button:hover {
+      color: var(--ink);
+      background: var(--yellow);
+      transform: translateY(-1px);
+    }
+
+    .submit-button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+      transform: none;
+    }
+
+    .form-status {
+      margin-top: 10px;
+    }
+
+    .local-test-hint {
+      margin-top: 2px;
+      padding: 9px 10px;
+      color: var(--muted);
+      background: rgba(229, 255, 0, 0.18);
+      border: 1px solid rgba(8, 8, 8, 0.14);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 8px;
+      line-height: 1.65;
+    }
+
+    .local-test-hint code {
+      color: var(--ink);
+      font-family: inherit;
+      font-weight: 700;
+    }
+
+    .account-view {
+      display: grid;
+      gap: 20px;
+      padding: 24px 22px 25px;
+    }
+
+    .account-identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .account-avatar {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      flex: 0 0 auto;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .account-identity-copy {
+      display: grid;
+      min-width: 0;
+      gap: 3px;
+    }
+
+    .account-identity-copy span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .account-identity-copy h2 {
+      overflow-wrap: anywhere;
+      font-size: clamp(24px, 3.2vw, 42px);
+      font-weight: 750;
+      letter-spacing: 0;
+      line-height: 0.98;
+    }
+
+    .account-details {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .account-detail {
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .account-detail span {
+      display: block;
+      color: var(--muted);
+      font-size: 7px;
+    }
+
+    .account-detail strong {
+      display: block;
+      margin-top: 5px;
+      overflow: hidden;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .account-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 7px;
+    }
+
+    .account-actions .submit-button {
+      min-height: 40px;
+    }
+
+    .outline-button {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 13px;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .profile-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+    }
+
+    .profile-form input {
+      min-width: 0;
+      height: 40px;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .profile-form button {
+      padding: 0 14px;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .screen-reader {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 1200;
+      max-width: min(330px, calc(100vw - 28px));
+      padding: 12px 14px;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 8px;
+      font-size: 10px;
+      line-height: 1.55;
+      opacity: 0;
+      translate: 0 10px;
+      pointer-events: none;
+      transition: opacity 0.25s ease, translate 0.3s var(--ease);
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    .site-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 17px 0 0;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .route-curtain {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .route-curtain.is-active {
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .route-curtain span {
+      background: var(--paper);
+      border-right: 1px solid var(--line);
+      transform: translateY(101%);
+      transition: transform 0.56s var(--ease);
+    }
+
+    .route-curtain.is-active span {
+      transform: translateY(0);
+    }
+
+    @keyframes cardIn {
+      from {
+        opacity: 0;
+        transform: translateY(22px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .account-layout {
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+        gap: 32px;
+        padding-top: 58px;
+      }
+
+      .account-intro {
+        padding-bottom: 0;
+      }
+
+      .account-intro h1 {
+        font-size: clamp(54px, 10vw, 82px);
+      }
+
+      .account-card {
+        width: min(100%, 610px);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .stage {
+        width: calc(100% - 24px);
+        padding-top: 9px;
+      }
+
+      .brand small,
+      .header-link:first-child {
+        display: none;
+      }
+
+      .header-link {
+        padding: 0 9px;
+      }
+
+      .account-layout {
+        min-height: calc(100vh - 80px);
+        padding-top: 42px;
+      }
+
+      .account-intro h1 {
+        font-size: clamp(48px, 15vw, 68px);
+      }
+
+      .account-intro > p {
+        margin-top: 19px;
+        font-size: 12px;
+      }
+
+      .cloud-map {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 260px;
+      }
+
+      .card-head,
+      .auth-view,
+      .account-view {
+        padding-right: 17px;
+        padding-left: 17px;
+      }
+
+      .auth-tabs {
+        margin-right: 17px;
+        margin-left: 17px;
+      }
+
+      .account-details {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-lines" aria-hidden="true"></div>
+  <div class="yellow-shard" aria-hidden="true"></div>
+
+  <div class="stage">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="返回 Pellosy 控制台">
+        <span class="brand-mark">P</span>
+        <span>PELLOSY ACCOUNT<br><small>CLOUDFLARE READY</small></span>
+      </a>
+      <nav class="header-links" aria-label="账户导航">
+        <a class="header-link" href="messagessend.html" data-route>私信 ↗</a>
+        <a class="header-link" href="index.html" data-route>控制台 ↗</a>
+        <a class="header-link" href="personalindex5.html" data-route>个人页 ↗</a>
+      </nav>
+    </header>
+
+    <main class="account-layout">
+      <section class="account-intro">
+        <p class="intro-label">PERSONAL ACCESS / CLOUDFLARE IDENTITY</p>
+        <h1>YOUR FIELD.<span>ONE ACCOUNT.</span></h1>
+        <p>
+          你的待办、聚合信号与个人页面共用同一个身份。登录状态保存在本站会话中，
+          数据请求通过 `/api` 路由交给 Cloudflare。
+        </p>
+        <div class="cloud-map" aria-label="账户服务">
+          <span>SESSION API</span>
+          <span>TODOS API</span>
+          <span>AGGREGATION API</span>
+        </div>
+      </section>
+
+      <section class="account-card" aria-label="账户面板">
+        <div class="card-head">
+          <span>ACCOUNT ACCESS</span>
+          <span class="cloud-state" id="cloudState">等待身份</span>
+        </div>
+
+        <div class="auth-tabs" id="authTabs" role="tablist" aria-label="登录或注册">
+          <button class="auth-tab" id="loginTab" type="button" role="tab" aria-selected="true" data-auth-tab="login">登录</button>
+          <button class="auth-tab" id="registerTab" type="button" role="tab" aria-selected="false" data-auth-tab="register">创建账户</button>
+        </div>
+
+        <div class="auth-view" id="loginView" data-auth-view="login">
+          <form class="auth-form" id="loginForm" novalidate>
+            <div class="field">
+              <label for="loginIdentifier">用户名或邮箱</label>
+              <input id="loginIdentifier" name="identifier" type="text" maxlength="120" autocomplete="username" placeholder="name@example.com" required>
+            </div>
+            <div class="field">
+              <label for="loginPassword">密码</label>
+              <input id="loginPassword" name="password" type="password" minlength="6" maxlength="128" autocomplete="current-password" placeholder="至少 6 个字符" required>
+            </div>
+            <div class="field-row">
+              <label class="check"><input id="rememberSession" type="checkbox" checked>记住登录</label>
+              <span>Cloudflare secured</span>
+            </div>
+            <div class="turnstile-slot">
+              <div id="turnstile-login" aria-label="登录人机验证"></div>
+              <p class="turnstile-note" data-turnstile-note="login"></p>
+            </div>
+            <p class="local-test-hint" id="localTestHint" hidden>
+              本地测试账户 <code>testuser</code> / <code>test1234</code>
+            </p>
+            <button class="submit-button" type="submit" data-submit-label>进入我的空间 ↗</button>
+            <p class="form-status" data-login-status aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="auth-view" id="registerView" data-auth-view="register" hidden>
+          <form class="auth-form" id="registerForm" novalidate>
+            <div class="field">
+              <label for="registerUsername">用户名</label>
+              <input id="registerUsername" name="username" type="text" maxlength="64" autocomplete="username" placeholder="你的显示名称" required>
+            </div>
+            <div class="field">
+              <label for="registerEmail">邮箱</label>
+              <input id="registerEmail" name="email" type="email" maxlength="160" autocomplete="email" placeholder="可选，用于账户恢复">
+            </div>
+            <div class="field">
+              <label for="registerPassword">密码</label>
+              <input id="registerPassword" name="password" type="password" minlength="6" maxlength="128" autocomplete="new-password" placeholder="至少 6 个字符" required>
+            </div>
+            <div class="field">
+              <label for="registerConfirm">确认密码</label>
+              <input id="registerConfirm" name="confirm" type="password" minlength="6" maxlength="128" autocomplete="new-password" placeholder="再次输入密码" required>
+            </div>
+            <div class="field-row">
+              <label class="check"><input id="registerTerms" type="checkbox">同意账户使用与隐私约定</label>
+            </div>
+            <div class="turnstile-slot">
+              <div id="turnstile-register" aria-label="注册人机验证"></div>
+              <p class="turnstile-note" data-turnstile-note="register"></p>
+            </div>
+            <button class="submit-button" type="submit" data-submit-label>创建 Pellosy 账户 ↗</button>
+            <p class="form-status" data-register-status aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="account-view" id="accountView" hidden>
+          <div class="account-identity">
+            <span class="account-avatar" id="accountAvatar">访</span>
+            <div class="account-identity-copy">
+              <span>SIGNED IN / CLOUDFLARE</span>
+              <h2 id="accountName">访客</h2>
+            </div>
+          </div>
+          <div class="account-details">
+            <div class="account-detail">
+              <span>用户名</span>
+              <strong id="accountUsername">--</strong>
+            </div>
+            <div class="account-detail">
+              <span>邮箱</span>
+              <strong id="accountEmail">未设置</strong>
+            </div>
+          </div>
+          <form class="profile-form" id="profileForm">
+            <label class="screen-reader" for="displayNameInput">显示名称</label>
+            <input id="displayNameInput" type="text" maxlength="64" autocomplete="name" placeholder="显示名称">
+            <button type="submit">更新资料</button>
+          </form>
+          <div class="account-actions">
+            <a class="submit-button" href="personalindex5.html" data-route>进入个人页 ↗</a>
+            <button class="outline-button" id="logoutButton" type="button">退出登录</button>
+          </div>
+          <p class="form-status" id="profileStatus" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>PELLOSY / ACCOUNT / 2026</span>
+      <span>Cloudflare Pages Functions · D1 ready</span>
+    </footer>
+  </div>
+
+  <div class="route-curtain" id="routeCurtain" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="cloud-api.js"></script>
+  <script>
+    if (["127.0.0.1", "localhost"].includes(location.hostname)) {
+      window.PELLOSY_TURNSTILE = { enabled: false, siteKey: "" };
+    }
+  </script>
+  <script src="turnstile-config.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector, scope = document) => scope.querySelector(selector);
+      const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+      const cloud = window.PellosyCloud;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const localTestMode = ["127.0.0.1", "localhost"].includes(location.hostname);
+      const nextParam = new URLSearchParams(location.search).get("next") || "";
+      const turnstileConfig = window.PELLOSY_TURNSTILE || {};
+      const tokens = { login: "", register: "" };
+      const widgets = { login: null, register: null };
+      const statusBox = $("#cloudState");
+      const toastNode = $("#toast");
+      let currentUser = cloud?.getCachedUser() || { ...(cloud?.guest || { name: "访客", guest: true }) };
+      let toastTimer = 0;
+      let turnstileTimer = 0;
+      let redirecting = false;
+
+      function safeNextPath() {
+        if (!nextParam) return "";
+        try {
+          const url = new URL(nextParam, location.href);
+          if (url.origin !== location.origin) return "";
+          if (!/\.html$/i.test(url.pathname)) return "";
+          return `${url.pathname}${url.search}${url.hash}`;
+        } catch {
+          return "";
+        }
+      }
+
+      function showToast(message) {
+        if (!toastNode) return;
+        toastNode.textContent = message;
+        toastNode.classList.add("is-visible");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toastNode.classList.remove("is-visible"), 2800);
+      }
+
+      function setStatus(message, tone = "") {
+        if (!statusBox) return;
+        statusBox.textContent = message;
+        statusBox.classList.toggle("is-online", tone === "online");
+      }
+
+      function setFormStatus(kind, message, tone = "") {
+        const node = kind === "login" ? $("[data-login-status]") : $("[data-register-status]");
+        if (!node) return;
+        node.textContent = message;
+        node.classList.toggle("is-error", tone === "error");
+        node.classList.toggle("is-success", tone === "success");
+      }
+
+      function setTab(tab) {
+        const next = tab === "register" ? "register" : "login";
+        $$("[data-auth-tab]").forEach((button) => {
+          button.setAttribute("aria-selected", String(button.dataset.authTab === next));
+        });
+        $$("[data-auth-view]").forEach((view) => {
+          view.hidden = view.dataset.authView !== next;
+        });
+        window.history.replaceState(null, "", `${location.pathname}${location.search}#${next}`);
+        window.setTimeout(() => renderTurnstile(next), 80);
+      }
+
+      function turnstileEnabled() {
+        return turnstileConfig.enabled !== false;
+      }
+
+      function setTurnstileNote(kind, message, tone = "") {
+        const note = $(`[data-turnstile-note="${kind}"]`);
+        if (!note) return;
+        note.textContent = message;
+        note.classList.toggle("is-error", tone === "error");
+        note.classList.toggle("is-ok", tone === "ok");
+      }
+
+      function renderTurnstile(kind) {
+        if (!turnstileEnabled()) return true;
+        if (!turnstileConfig.siteKey) {
+          setTurnstileNote(kind, "尚未配置 Turnstile Site Key", "error");
+          return false;
+        }
+        const box = $(`#turnstile-${kind}`);
+        if (!box || widgets[kind] !== null) return widgets[kind] !== null;
+        if (!window.turnstile || typeof window.turnstile.render !== "function") return false;
+
+        widgets[kind] = window.turnstile.render(box, {
+          sitekey: turnstileConfig.siteKey,
+          theme: "light",
+          callback: (token) => {
+            tokens[kind] = token || "";
+            setTurnstileNote(kind, "验证已通过", "ok");
+          },
+          "expired-callback": () => {
+            tokens[kind] = "";
+            setTurnstileNote(kind, "验证已过期，请重新验证", "error");
+          },
+          "error-callback": () => {
+            tokens[kind] = "";
+            setTurnstileNote(kind, "验证组件加载失败", "error");
+          }
+        });
+        return true;
+      }
+
+      function initTurnstile() {
+        if (!turnstileEnabled()) {
+          setStatus("未启用验证", "online");
+          return;
+        }
+        let attempts = 0;
+        const attempt = () => {
+          const ready = renderTurnstile("login");
+          attempts += 1;
+          if (!ready && attempts < 80) {
+            turnstileTimer = window.setTimeout(attempt, 240);
+          } else if (!ready) {
+            setTurnstileNote("login", "验证组件加载超时，请刷新重试", "error");
+            setTurnstileNote("register", "验证组件加载超时，请刷新重试", "error");
+          }
+        };
+        attempt();
+      }
+
+      function resetTurnstile(kind) {
+        tokens[kind] = "";
+        if (window.turnstile && widgets[kind] !== null) {
+          try {
+            window.turnstile.reset(widgets[kind]);
+          } catch {}
+        }
+        setTurnstileNote(kind, "");
+      }
+
+      function setSubmitting(form, submitting, label) {
+        const button = $("button[type='submit']", form);
+        if (!button) return;
+        button.disabled = submitting;
+        if (!button.dataset.originalLabel) {
+          button.dataset.originalLabel = $("[data-submit-label]", button)?.textContent || button.textContent;
+        }
+        const target = $("[data-submit-label]", button) || button;
+        target.textContent = submitting ? label : button.dataset.originalLabel;
+      }
+
+      function requireToken(kind) {
+        if (!turnstileEnabled()) return "";
+        if (!tokens[kind]) {
+          throw new Error("请先完成人机验证");
+        }
+        return tokens[kind];
+      }
+
+      function applySession(user) {
+        currentUser = user && !user.guest ? user : { ...(cloud?.guest || { name: "访客", guest: true }) };
+        const signedIn = !currentUser.guest;
+        $("#authTabs").hidden = signedIn;
+        $$("[data-auth-view]").forEach((view) => {
+          view.hidden = signedIn || view.dataset.authView !== ($("[data-auth-tab][aria-selected='true']")?.dataset.authTab || "login");
+        });
+        $("#accountView").hidden = !signedIn;
+        setStatus(signedIn ? "已连接" : "等待身份", signedIn ? "online" : "");
+        if (signedIn) {
+          const name = currentUser.name || currentUser.username || "用户";
+          $("#accountName").textContent = name;
+          $("#accountAvatar").textContent = cloud.initials(name);
+          $("#accountUsername").textContent = currentUser.username || name;
+          $("#accountEmail").textContent = currentUser.email || "未设置";
+          $("#displayNameInput").value = name;
+          document.title = `${name} / Account`;
+          window.history.replaceState(null, "", `${location.pathname}${location.search}#account`);
+          const nextPath = safeNextPath();
+          if (nextPath && !redirecting) {
+            redirecting = true;
+            setStatus("身份已验证，正在进入…", "online");
+            window.setTimeout(() => location.replace(nextPath), 460);
+          }
+        } else {
+          document.title = "账户 / Pellosy";
+          setTab(location.hash === "#register" ? "register" : "login");
+        }
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const identifier = $("#loginIdentifier").value.trim();
+        const password = $("#loginPassword").value;
+        if (!identifier || !password) {
+          setFormStatus("login", "请填写用户名和密码", "error");
+          return;
+        }
+        setFormStatus("login", "正在验证账户…");
+        setSubmitting(form, true, "连接中…");
+        try {
+          const token = requireToken("login");
+          const user = await cloud.login(
+            { identifier, password, turnstileToken: token },
+            $("#rememberSession").checked
+          );
+          applySession(user);
+          setFormStatus("login", "登录成功", "success");
+          showToast(`欢迎回来，${user.name}`);
+        } catch (error) {
+          setFormStatus("login", error.message || "登录失败", "error");
+          resetTurnstile("login");
+        } finally {
+          setSubmitting(form, false, "");
+        }
+      }
+
+      async function handleRegister(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const username = $("#registerUsername").value.trim();
+        const email = $("#registerEmail").value.trim();
+        const password = $("#registerPassword").value;
+        const confirm = $("#registerConfirm").value;
+        if (!username || !password) {
+          setFormStatus("register", "用户名和密码不能为空", "error");
+          return;
+        }
+        if (password.length < 6) {
+          setFormStatus("register", "密码至少需要 6 个字符", "error");
+          return;
+        }
+        if (password !== confirm) {
+          setFormStatus("register", "两次输入的密码不一致", "error");
+          return;
+        }
+        if (!$("#registerTerms").checked) {
+          setFormStatus("register", "请先同意账户使用与隐私约定", "error");
+          return;
+        }
+        setFormStatus("register", "正在创建账户…");
+        setSubmitting(form, true, "创建中…");
+        try {
+          const token = requireToken("register");
+          const user = await cloud.register(
+            { username, email, password, turnstileToken: token },
+            true
+          );
+          applySession(user);
+          setFormStatus("register", "账户已创建", "success");
+          showToast(`账户已创建，${user.name}`);
+        } catch (error) {
+          setFormStatus("register", error.message || "注册失败", "error");
+          resetTurnstile("register");
+        } finally {
+          setSubmitting(form, false, "");
+        }
+      }
+
+      function bindRouteTransitions() {
+        const curtain = $("#routeCurtain");
+        document.addEventListener("click", (event) => {
+          const link = event.target.closest("[data-route]");
+          if (!link || !curtain || reducedMotion) return;
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          const href = link.getAttribute("href");
+          if (!href) return;
+          event.preventDefault();
+          curtain.classList.add("is-active");
+          curtain.setAttribute("aria-hidden", "false");
+          window.setTimeout(() => {
+            location.href = href;
+          }, 620);
+        });
+      }
+
+      async function init() {
+        if (!cloud) {
+          setStatus("API 适配器缺失");
+          return;
+        }
+        if (localTestMode) {
+          $("#localTestHint").hidden = false;
+          $("#loginIdentifier").value = "testuser";
+          $("#loginPassword").value = "test1234";
+        }
+        applySession(currentUser);
+        $$("[data-auth-tab]").forEach((button) => {
+          button.addEventListener("click", () => setTab(button.dataset.authTab));
+        });
+        $("#loginForm").addEventListener("submit", handleLogin);
+        $("#registerForm").addEventListener("submit", handleRegister);
+        $("#logoutButton").addEventListener("click", async () => {
+          await cloud.logout();
+          currentUser = { ...cloud.guest };
+          applySession(currentUser);
+          setTab("login");
+          showToast("已退出登录");
+        });
+        $("#profileForm").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const displayName = $("#displayNameInput").value.trim();
+          if (!displayName) {
+            $("#profileStatus").textContent = "显示名称不能为空";
+            return;
+          }
+          $("#profileStatus").textContent = "正在更新…";
+          try {
+            const user = await cloud.updateProfile({ displayName });
+            applySession(user);
+            $("#profileStatus").textContent = "资料已更新";
+            showToast("资料已更新");
+          } catch (error) {
+            $("#profileStatus").textContent = error.message || "资料接口尚未连接";
+          }
+        });
+        bindRouteTransitions();
+        initTurnstile();
+        const resolved = await cloud.loadSession();
+        applySession(resolved || currentUser);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
