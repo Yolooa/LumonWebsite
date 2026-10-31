@@ -4861,17 +4861,20 @@
 
     .title-mask {
       width: 100%;
+      min-width: 0;
       margin: 0;
       padding: 0;
       overflow: hidden;
     }
 
     body.intro-complete .title-mask {
-      overflow: visible;
+      overflow-x: clip;
+      overflow-y: visible;
     }
 
     .title-mask h1 {
-      max-width: none;
+      width: 100%;
+      max-width: 100%;
       color: var(--text);
       font-family: "Arial Black", "Helvetica Neue", Arial, "PingFang SC",
         "Microsoft YaHei", sans-serif;
@@ -4889,6 +4892,7 @@
     }
 
     .title-mask h1 .typing-line {
+      max-width: 100%;
       overflow: hidden;
       white-space: nowrap;
     }
@@ -7190,8 +7194,50 @@
           { one: "STAY", two: "CURIOUS.", label: `Stay curious, ${userName}.` },
           { one: "MAKE", two: "IT CLEAR.", label: `Make it clear, ${userName}.` },
           { one: "MOVE", two: "FORWARD.", label: `Move forward, ${userName}.` },
-          { one: "KEEP", two: "FOCUS.", label: `Keep focus, ${userName}.` }
+          { one: "KEEP", two: "FOCUS.", label: `Keep focus, ${userName}.` },
+          { one: "THINK", two: "DEEPER.", label: `Think deeper, ${userName}.` },
+          { one: "BUILD", two: "WITH CARE.", label: `Build with care, ${userName}.` },
+          { one: "READ", two: "THE SIGNAL.", label: `Read the signal, ${userName}.` },
+          { one: "START", two: "SMALL.", label: `Start small, ${userName}.` },
+          { one: "SHIP", two: "THE WORK.", label: `Ship the work, ${userName}.` },
+          { one: "CHOOSE", two: "WHAT MATTERS.", label: `Choose what matters, ${userName}.` },
+          { one: "LOOK", two: "CLOSER.", label: `Look closer, ${userName}.` },
+          { one: "FIND", two: "THE THREAD.", label: `Find the thread, ${userName}.` },
+          { one: "LESS", two: "BUT BETTER.", label: `Less but better, ${userName}.` },
+          { one: "SLOW", two: "IS SMOOTH.", label: `Slow is smooth, ${userName}.` },
+          { one: "BEGIN", two: "AGAIN.", label: `Begin again, ${userName}.` }
         ];
+        const greetingPhrase = phrases.shift();
+        for (let index = phrases.length - 1; index > 0; index -= 1) {
+          const target = Math.floor(Math.random() * (index + 1));
+          [phrases[index], phrases[target]] = [phrases[target], phrases[index]];
+        }
+        phrases.unshift(greetingPhrase);
+        const title = lineOne.closest("h1");
+        const measureCanvas = document.createElement("canvas");
+        const measureContext = measureCanvas.getContext("2d");
+        let activePhrase = phrases[0];
+
+        const fitPhrase = (phrase) => {
+          activePhrase = phrase;
+          if (!title) return;
+          lineOne.style.fontSize = "";
+          lineTwo.style.fontSize = "";
+          const available = Math.max(1, title.clientWidth - 6);
+          const baseSize = Number.parseFloat(getComputedStyle(title).fontSize) || 72;
+          if (!measureContext) return;
+          measureContext.font = `900 ${baseSize}px "Arial Black", Arial, sans-serif`;
+          const measured = Math.max(
+            measureContext.measureText(phrase.one).width,
+            measureContext.measureText(phrase.two).width
+          );
+          const safeWidth = measured + baseSize * 0.11;
+          if (safeWidth > available) {
+            const fitted = Math.max(30, baseSize * (available / safeWidth) * 0.97);
+            lineOne.style.fontSize = `${fitted}px`;
+            lineTwo.style.fontSize = `${fitted}px`;
+          }
+        };
         const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
         let started = false;
         let generation = 0;
@@ -7259,6 +7305,7 @@
           await sleep(220);
           while (token === generation) {
             const phrase = phrases[index % phrases.length];
+            fitPhrase(phrase);
             if (!await writePhrase(phrase, 92, token)) {
               return;
             }
@@ -7278,6 +7325,7 @@
           started = true;
           generation += 1;
           if (reduceMotion) {
+            fitPhrase(phrases[0]);
             lineOne.textContent = phrases[0].one;
             lineTwo.textContent = phrases[0].two;
             accessible.textContent = phrases[0].label;
@@ -7293,6 +7341,7 @@
           window.addEventListener("pellosy:intro-complete", start, { once: true });
           window.setTimeout(start, 3000);
         }
+        window.addEventListener("resize", () => fitPhrase(activePhrase), { passive: true });
       }
 
       function initializeDailyQuote() {
