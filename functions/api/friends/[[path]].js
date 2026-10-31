@@ -141,18 +141,47 @@ export async function onRequest(context) {
         }
       }
 
-      await db.batch([
-        db.prepare(
-          `INSERT INTO friendships (user_id, friend_id, status, created_at)
-           VALUES (?, ?, 'pending', CURRENT_TIMESTAMP)`
-        ).bind(user.id, candidateId),
-        friendRequestNotification(
+      const inserted = await db.prepare(
+        `INSERT OR IGNORE INTO friendships (user_id, friend_id, status, created_at)
+         VALUES (?, ?, 'pending', CURRENT_TIMESTAMP)`
+      ).bind(user.id, candidateId).run();
+      if (!Number(inserted.meta?.changes || 0)) {
+        const latestRelations = await friendshipBetween(db, user.id, candidateId);
+        const nowAccepted = latestRelations.some((relation) => relation.status === "accepted");
+        const incomingPending = latestRelations.some((relation) => (
+          relation.status === "pending" && String(relation.user_id) !== user.id
+        ));
+        const outgoingPending = latestRelations.some((relation) => (
+          relation.status === "pending" && String(relation.user_id) === user.id
+        ));
+        throw new ApiError(
+          nowAccepted
+            ? "你们已经是好友"
+            : incomingPending
+              ? "对方已经向你发送了好友申请，请到申请入口处理"
+              : "好友申请已经存在，请等待对方处理",
+          409,
+          nowAccepted
+            ? "ALREADY_FRIEND"
+            : incomingPending
+              ? "INCOMING_REQUEST_EXISTS"
+              : outgoingPending
+                ? "ALREADY_REQUESTED"
+                : "REQUEST_NOT_CREATED"
+        );
+      }
+
+      try {
+        await friendRequestNotification(
           db,
           candidateId,
           `${user.name} 请求添加你为好友`,
           "前往私聊页查看并处理好友申请"
-        )
-      ]);
+        ).run();
+      } catch (notificationError) {
+        // The request itself must not fail when the secondary notification write fails.
+        console.error("friend-request notification failed", notificationError);
+      }
       return json({
         success: true,
         pending: true,
@@ -182,23 +211,26 @@ export async function onRequest(context) {
         throw new ApiError("这条好友申请已失效", 404, "REQUEST_NOT_FOUND");
       }
 
-      await db.batch([
-        db.prepare(
-          `UPDATE friendships
-           SET status = 'accepted'
-           WHERE user_id = ? AND friend_id = ? AND status = 'pending'`
-        ).bind(requesterId, user.id),
-        db.prepare(
-          `INSERT OR IGNORE INTO friendships (user_id, friend_id, status, created_at)
-           VALUES (?, ?, 'accepted', CURRENT_TIMESTAMP)`
-        ).bind(user.id, requesterId),
-        friendRequestNotification(
+      await db.prepare(
+        `UPDATE friendships
+         SET status = 'accepted'
+         WHERE user_id = ? AND friend_id = ? AND status = 'pending'`
+      ).bind(requesterId, user.id).run();
+      await db.prepare(
+        `INSERT OR IGNORE INTO friendships (user_id, friend_id, status, created_at)
+         VALUES (?, ?, 'accepted', CURRENT_TIMESTAMP)`
+      ).bind(user.id, requesterId).run();
+
+      try {
+        await friendRequestNotification(
           db,
           requesterId,
           `${user.name} 已同意你的好友申请`,
           "现在可以开始私聊了"
-        )
-      ]);
+        ).run();
+      } catch (notificationError) {
+        console.error("friend-accept notification failed", notificationError);
+      }
 
       const conversationId = await createDirectConversation(
         db,
@@ -238,6 +270,12 @@ export async function onRequest(context) {
     requireMethod(context.request, ["GET", "POST"]);
     throw new ApiError("好友接口不存在", 404, "NOT_FOUND");
   } catch (error) {
+    console.error("friends-api", {
+      method: context.request.method,
+      path: new URL(context.request.url).pathname,
+      code: error?.code || "INTERNAL_ERROR",
+      message: error?.message || String(error)
+    });
     return errorResponse(error);
   }
 }
