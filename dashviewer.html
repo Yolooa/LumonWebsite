@@ -1365,7 +1365,7 @@
       <h1>访问监控</h1>
       <p>请输入 Cloudflare 中配置的 DASHBOARD_PASSWORD。口令只保存在当前浏览器会话。</p>
       <form id="gateForm">
-        <input id="gatePassword" type="password" maxlength="256" autocomplete="current-password" placeholder="访问口令" required>
+        <input id="gatePassword" type="password" maxlength="256" autocomplete="off" data-lpignore="true" placeholder="访问口令" required>
         <button type="submit">进入监控台 ↗</button>
         <p class="gate-status" id="gateStatus" aria-live="polite"></p>
       </form>
@@ -1602,7 +1602,6 @@
 
       const $ = (selector, scope = document) => scope.querySelector(selector);
       const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
-      const TOKEN_KEY = "lumon.dashviewer.token";
       const AUTO_REFRESH_MS = 15000;
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const state = {
@@ -1766,7 +1765,7 @@
         state.token = "";
         state.data = null;
         try {
-          sessionStorage.removeItem(TOKEN_KEY);
+          sessionStorage.removeItem("lumon.dashviewer.token");
         } catch {}
         $("#app").hidden = true;
         $("#gate").hidden = false;
@@ -2235,9 +2234,6 @@
         $("#gateStatus").textContent = "正在验证口令…";
         await loadData();
         if (state.data) {
-          try {
-            sessionStorage.setItem(TOKEN_KEY, token);
-          } catch {}
           $("#gateStatus").textContent = "";
           startAutoRefresh();
         } else {
@@ -2251,6 +2247,9 @@
           $("[data-home-link]").setAttribute("href", "index5.html");
         }
         $("#gateForm").addEventListener("submit", submitPassword);
+        window.addEventListener("pageshow", (event) => {
+          if (event.persisted) lock("页面已恢复，请重新输入访问口令");
+        });
         $("#refreshButton").addEventListener("click", () => loadData());
         $("#lockButton").addEventListener("click", () => lock("已锁定"));
         $("#exportButton").addEventListener("click", exportCsv);
@@ -2292,15 +2291,14 @@
         bind();
         bindMotion();
         $("#autoRefreshButton").classList.add("is-active");
-        let saved = "";
         try {
-          saved = sessionStorage.getItem(TOKEN_KEY) || "";
+          sessionStorage.removeItem("lumon.dashviewer.token");
         } catch {}
-        if (!saved) return;
-        state.token = saved;
-        await loadData(true);
-        if (state.data) startAutoRefresh();
-        else state.token = "";
+        state.token = "";
+        state.data = null;
+        $("#app").hidden = true;
+        $("#gate").hidden = false;
+        $("#gatePassword").value = "";
       }
 
       init();
