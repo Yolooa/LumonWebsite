@@ -342,12 +342,13 @@
 
     .conversation-actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
       margin-top: 13px;
     }
 
     .side-action {
+      position: relative;
       display: inline-flex;
       min-height: 34px;
       align-items: center;
@@ -361,7 +362,7 @@
       transition: background 0.2s ease, color 0.2s ease;
     }
 
-    .side-action:first-child:hover {
+    .side-action:not(:last-child):hover {
       background: var(--yellow);
     }
 
@@ -369,6 +370,27 @@
       color: var(--paper);
       background: var(--ink);
       border-color: var(--ink);
+    }
+
+    .request-badge {
+      display: inline-grid;
+      min-width: 17px;
+      height: 17px;
+      place-items: center;
+      padding: 0 4px;
+      color: var(--accent-ink);
+      background: var(--yellow);
+      border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: 7px;
+      font-weight: 800;
+      line-height: 1;
+      animation: badgePop 0.36s var(--spring) both;
+    }
+
+    .request-badge[hidden] {
+      display: none;
     }
 
     .conversation-list {
@@ -813,6 +835,13 @@
       font-size: 17px;
     }
 
+    .dialog-description {
+      margin: 13px 0 12px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.65;
+    }
+
     .dialog-form {
       display: grid;
       gap: 10px;
@@ -1164,6 +1193,126 @@
       font-size: 10px;
     }
 
+    .request-list {
+      display: grid;
+      max-height: min(390px, 56vh);
+      gap: 7px;
+      padding: 2px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+    }
+
+    .friend-request-item {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 66px;
+      padding: 10px;
+      background: color-mix(in srgb, var(--paper) 34%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      animation: listItemIn 0.48s var(--spring) both;
+      animation-delay: calc(var(--request-index, 0) * 46ms);
+    }
+
+    .friend-request-avatar {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      color: var(--accent-ink);
+      background: var(--yellow);
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 13px;
+    }
+
+    .friend-request-copy {
+      display: grid;
+      min-width: 0;
+      gap: 2px;
+    }
+
+    .friend-request-copy strong,
+    .friend-request-copy span,
+    .friend-request-copy time {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .friend-request-copy strong {
+      font-size: 11px;
+    }
+
+    .friend-request-copy span,
+    .friend-request-copy time {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .friend-request-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .request-action {
+      display: grid;
+      min-width: 52px;
+      min-height: 30px;
+      place-items: center;
+      padding: 0 9px;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 700;
+      transition: color 0.2s ease, background 0.2s ease, transform 0.2s var(--spring);
+    }
+
+    .request-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .request-action.accept {
+      color: var(--accent-ink);
+      background: var(--yellow);
+      border-color: var(--ink);
+    }
+
+    .request-action.reject:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .request-action:disabled {
+      opacity: 0.52;
+      transform: none;
+    }
+
+    .request-list-state {
+      display: grid;
+      min-height: 150px;
+      place-content: center;
+      justify-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 8px;
+      line-height: 1.55;
+    }
+
+    .request-list-state strong {
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 500;
+    }
+
     .access-gate {
       position: fixed;
       inset: 0;
@@ -1265,6 +1414,7 @@
 
     .header-link:hover,
     .side-action:first-child:hover,
+    #openFriendRequests:hover,
     .lookup-button:hover,
     .dialog-submit:not(:disabled):hover,
     .friend-result-action:not(:disabled):hover {
@@ -1426,6 +1576,12 @@
       to { opacity: 1; transform: scale(1); }
     }
 
+    @keyframes badgePop {
+      0% { opacity: 0; transform: scale(0.45) rotate(-10deg); }
+      70% { opacity: 1; transform: scale(1.12) rotate(2deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
     @keyframes statusPulse {
       0%, 100% { opacity: 0.28; transform: scale(0.8); }
       50% { opacity: 1; transform: scale(1.35); }
@@ -1527,6 +1683,23 @@
       .friend-result-action {
         grid-column: 1 / -1;
       }
+
+      .friend-request-item {
+        grid-template-columns: 40px minmax(0, 1fr);
+      }
+
+      .friend-request-avatar {
+        width: 40px;
+        height: 40px;
+      }
+
+      .friend-request-actions {
+        grid-column: 1 / -1;
+      }
+
+      .request-action {
+        flex: 1;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1588,6 +1761,10 @@
           </div>
           <div class="conversation-actions">
             <button class="side-action" id="openFriendDialog" type="button">＋ 好友</button>
+            <button class="side-action" id="openFriendRequests" type="button">
+              申请
+              <span class="request-badge" id="friendRequestBadge" hidden>0</span>
+            </button>
             <button class="side-action" id="openGroupDialog" type="button">＋ 群聊</button>
           </div>
         </div>
@@ -1629,8 +1806,8 @@
     <div class="dialog-inner">
       <div class="dialog-head">
         <div>
-          <span>ADD / FRIEND</span>
-          <h2 id="friendDialogTitle">添加好友</h2>
+          <span>REQUEST / FRIEND</span>
+          <h2 id="friendDialogTitle">发送好友申请</h2>
         </div>
         <button class="dialog-close" type="button" data-close-dialog="friendDialog" aria-label="关闭">×</button>
       </div>
@@ -1646,10 +1823,29 @@
             <strong id="friendLookupName"></strong>
             <span id="friendLookupUsername"></span>
           </span>
-          <button class="friend-result-action" id="confirmFriendButton" type="button">添加好友</button>
+          <button class="friend-result-action" id="confirmFriendButton" type="button">发送申请</button>
         </div>
         <p class="dialog-status" data-friend-status aria-live="polite"></p>
       </form>
+    </div>
+  </dialog>
+
+  <dialog id="friendRequestsDialog" aria-labelledby="friendRequestsDialogTitle">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <div>
+          <span>INBOX / REQUESTS</span>
+          <h2 id="friendRequestsDialogTitle">好友申请</h2>
+        </div>
+        <button class="dialog-close" type="button" data-close-dialog="friendRequestsDialog" aria-label="关闭">×</button>
+      </div>
+      <p class="dialog-description">同意后会建立双向好友关系，并创建一段私聊。</p>
+      <div class="request-list" id="friendRequestList" aria-live="polite">
+        <div class="request-list-state">
+          <strong>正在读取申请</strong>
+          <span>从 Cloudflare 同步好友申请</span>
+        </div>
+      </div>
     </div>
   </dialog>
 
@@ -1706,6 +1902,8 @@
       let currentUser = cloud?.getCachedUser() || { ...(cloud?.guest || { name: "访客", guest: true }) };
       let conversations = [];
       let friends = [];
+      let friendRequests = [];
+      let friendRequestSignature = null;
       let selectedFriend = null;
       const selectedGroupFriends = new Map();
       let activeConversation = null;
@@ -1947,7 +2145,7 @@
         result.className = "friend-result";
         $("#confirmFriendButton").hidden = false;
         $("#confirmFriendButton").disabled = false;
-        $("#confirmFriendButton").textContent = "添加好友";
+        $("#confirmFriendButton").textContent = "发送申请";
         setDialogStatus($("[data-friend-status]"), "");
       }
 
@@ -2058,11 +2256,142 @@
         }
       }
 
+      function updateRequestBadge(count) {
+        const badge = $("#friendRequestBadge");
+        const value = Math.max(0, Number(count) || 0);
+        badge.hidden = value === 0;
+        badge.textContent = value > 99 ? "99+" : String(value);
+      }
+
+      function requestTime(value) {
+        if (!value) return "刚刚";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return String(value).slice(0, 16);
+        const today = new Date();
+        if (date.toDateString() === today.toDateString()) {
+          return `今天 ${date.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
+        }
+        return date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+      }
+
+      function renderFriendRequestState(title, detail, error = false) {
+        const list = $("#friendRequestList");
+        const state = document.createElement("div");
+        state.className = "request-list-state";
+        state.innerHTML = "<strong></strong><span></span>";
+        $("strong", state).textContent = title;
+        $("span", state).textContent = detail;
+        if (error) $("strong", state).style.color = "var(--danger)";
+        list.replaceChildren(state);
+      }
+
+      async function handleFriendRequest(request, decision, item) {
+        const buttons = $$("button", item);
+        buttons.forEach((button) => {
+          button.disabled = true;
+        });
+        item.style.opacity = "0.62";
+        try {
+          if (decision === "accept") {
+            await cloud.friends.accept(request.user.id);
+            showToast(`已同意 ${request.user.name} 的好友申请`);
+          } else {
+            await cloud.friends.reject(request.user.id);
+            showToast(`已拒绝 ${request.user.name} 的好友申请`);
+          }
+          await Promise.all([
+            refreshFriendRequests(),
+            loadFriends(true),
+            refreshConversations(true)
+          ]);
+        } catch (error) {
+          item.style.opacity = "";
+          buttons.forEach((button) => {
+            button.disabled = false;
+          });
+          showToast(error.message || "好友申请处理失败");
+        }
+      }
+
+      function renderFriendRequests() {
+        const list = $("#friendRequestList");
+        updateRequestBadge(friendRequests.length);
+        if (!friendRequests.length) {
+          renderFriendRequestState("暂无新的好友申请", "收到申请后可以在这里同意或拒绝");
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        friendRequests.forEach((request, index) => {
+          const item = document.createElement("article");
+          item.className = "friend-request-item";
+          item.style.setProperty("--request-index", String(index));
+          item.innerHTML = `
+            <span class="friend-request-avatar"></span>
+            <span class="friend-request-copy">
+              <strong></strong>
+              <span></span>
+              <time></time>
+            </span>
+            <span class="friend-request-actions">
+              <button class="request-action accept" type="button">同意</button>
+              <button class="request-action reject" type="button">拒绝</button>
+            </span>
+          `;
+          const name = request.user.name || request.user.username || "用户";
+          $(".friend-request-avatar", item).textContent = cloud.initials(name);
+          $(".friend-request-copy strong", item).textContent = name;
+          $(".friend-request-copy span", item).textContent = `@${request.user.username || request.user.id}`;
+          $(".friend-request-copy time", item).textContent = requestTime(request.createdAt);
+          $(".request-action.accept", item).addEventListener(
+            "click",
+            () => handleFriendRequest(request, "accept", item)
+          );
+          $(".request-action.reject", item).addEventListener(
+            "click",
+            () => handleFriendRequest(request, "reject", item)
+          );
+          fragment.appendChild(item);
+        });
+        list.replaceChildren(fragment);
+      }
+
+      async function refreshFriendRequests(silent = false) {
+        if (!silent && !friendRequests.length) {
+          renderFriendRequestState("正在读取申请", "从 Cloudflare 同步好友申请");
+        }
+        try {
+          const result = await cloud.friends.requests();
+          friendRequests = result.incoming || [];
+          const nextSignature = friendRequests
+            .map((request) => `${request.id}:${request.createdAt}`)
+            .join("|");
+          if (nextSignature !== friendRequestSignature) {
+            friendRequestSignature = nextSignature;
+            renderFriendRequests();
+          } else {
+            updateRequestBadge(friendRequests.length);
+          }
+        } catch (error) {
+          if (!silent) {
+            renderFriendRequestState(
+              "好友申请未连接",
+              error.message || "请检查 /api/friends/requests",
+              true
+            );
+          }
+        }
+      }
+
       function openDialog(id) {
         const dialog = document.getElementById(id);
         if (!dialog) return;
         if (id === "friendDialog") {
           resetFriendLookup();
+        }
+        if (id === "friendRequestsDialog") {
+          renderFriendRequests();
+          refreshFriendRequests(true);
         }
         if (id === "groupDialog") {
           selectedGroupFriends.clear();
@@ -2071,7 +2400,7 @@
           setDialogStatus($("[data-group-status]"), "");
           renderSelectedFriends();
           renderFriendPickerState("正在读取好友", "选择一个或多个好友建群");
-          loadFriends();
+          loadFriends(true);
         }
         dialog.showModal();
         window.setTimeout(() => {
@@ -2101,6 +2430,7 @@
 
       function bindDialogs() {
         $("#openFriendDialog").addEventListener("click", () => openDialog("friendDialog"));
+        $("#openFriendRequests").addEventListener("click", () => openDialog("friendRequestsDialog"));
         $("#openGroupDialog").addEventListener("click", () => openDialog("groupDialog"));
         $$("[data-close-dialog]").forEach((button) => {
           button.addEventListener("click", () => {
@@ -2130,6 +2460,8 @@
           if (!query) return;
           selectedFriend = null;
           result.hidden = true;
+          action.hidden = true;
+          action.disabled = true;
           lookupButton.disabled = true;
           setDialogStatus(status, "正在验证用户…", "loading");
           try {
@@ -2142,7 +2474,7 @@
               $("#friendLookupName").textContent = "未找到该用户";
               $("#friendLookupUsername").textContent = "请检查用户名或好友 ID";
               action.hidden = true;
-              setDialogStatus(status, "没有这个用户，无法添加好友", "error");
+              setDialogStatus(status, "没有这个用户，无法发送好友申请", "error");
               return;
             }
             selectedFriend = lookup.user;
@@ -2151,16 +2483,35 @@
             $("#friendLookupName").textContent = name;
             $("#friendLookupUsername").textContent = `@${lookup.user.username}`;
             action.hidden = false;
-            action.disabled = Boolean(lookup.user.alreadyFriend || lookup.user.isSelf);
+            action.disabled = Boolean(
+              lookup.user.alreadyFriend
+              || lookup.user.isSelf
+              || lookup.user.requestPending
+              || lookup.user.incomingRequest
+            );
             action.textContent = lookup.user.alreadyFriend
               ? "已经是好友"
               : lookup.user.isSelf
                 ? "这是你自己"
-                : "添加好友";
+                : lookup.user.requestPending
+                  ? "申请已发送"
+                  : lookup.user.incomingRequest
+                    ? "待你处理"
+                    : "发送申请";
             setDialogStatus(
               status,
-              lookup.user.alreadyFriend ? "已确认用户身份，你们已经是好友" : "已确认用户存在，可以安全添加",
-              lookup.user.alreadyFriend ? "" : "success"
+              lookup.user.alreadyFriend
+                ? "已确认用户身份，你们已经是好友"
+                : lookup.user.isSelf
+                  ? "这是你自己的账号"
+                  : lookup.user.requestPending
+                    ? "申请正在等待对方处理"
+                    : lookup.user.incomingRequest
+                      ? "对方已经向你发送申请，请到上方“申请”入口处理"
+                      : "已确认用户存在，发送申请后需要对方同意",
+              lookup.user.alreadyFriend || lookup.user.requestPending || lookup.user.incomingRequest
+                ? ""
+                : "success"
             );
           } catch (error) {
             result.hidden = true;
@@ -2177,26 +2528,47 @@
         });
 
         $("#confirmFriendButton").addEventListener("click", async () => {
-          if (!selectedFriend || selectedFriend.alreadyFriend || selectedFriend.isSelf) return;
+          if (
+            !selectedFriend
+            || selectedFriend.alreadyFriend
+            || selectedFriend.isSelf
+            || selectedFriend.requestPending
+            || selectedFriend.incomingRequest
+          ) return;
           const action = $("#confirmFriendButton");
           const status = $("[data-friend-status]");
           action.disabled = true;
-          action.textContent = "添加中…";
-          setDialogStatus(status, "正在建立好友关系…", "loading");
+          action.textContent = "发送中…";
+          setDialogStatus(status, "正在发送好友申请…", "loading");
           try {
-            const friend = await cloud.friends.add(selectedFriend.id);
-            selectedFriend.alreadyFriend = true;
-            action.textContent = "已经是好友";
-            setDialogStatus(status, `已添加 ${friend.name || selectedFriend.name}`, "success");
-            showToast(`好友 ${friend.name || selectedFriend.name} 已添加`);
-            await Promise.all([
-              refreshConversations(true),
-              loadFriends(true)
-            ]);
+            await cloud.friends.sendRequest(selectedFriend.id);
+            selectedFriend.requestPending = true;
+            action.textContent = "申请已发送";
+            setDialogStatus(
+              status,
+              `已向 ${selectedFriend.name || selectedFriend.username} 发送好友申请，等待对方同意`,
+              "success"
+            );
+            showToast(`好友申请已发送给 ${selectedFriend.name || selectedFriend.username}`);
+            refreshFriendRequests(true);
           } catch (error) {
-            action.disabled = error.code === "ALREADY_FRIEND";
-            action.textContent = error.code === "ALREADY_FRIEND" ? "已经是好友" : "重试添加";
-            setDialogStatus(status, error.message || "添加好友失败", "error");
+            if (error.code === "ALREADY_FRIEND") {
+              selectedFriend.alreadyFriend = true;
+              action.textContent = "已经是好友";
+              refreshConversations(true);
+              loadFriends(true);
+            } else if (error.code === "ALREADY_REQUESTED") {
+              selectedFriend.requestPending = true;
+              action.textContent = "申请已发送";
+            } else if (error.code === "INCOMING_REQUEST_EXISTS") {
+              selectedFriend.incomingRequest = true;
+              action.textContent = "待你处理";
+              refreshFriendRequests();
+            } else {
+              action.disabled = false;
+              action.textContent = "重试发送";
+            }
+            setDialogStatus(status, error.message || "好友申请发送失败", "error");
           }
         });
 
@@ -2322,10 +2694,16 @@
             $("#messageForm").requestSubmit();
           }
         });
-        await refreshConversations();
+        await Promise.all([
+          refreshConversations(),
+          refreshFriendRequests()
+        ]);
         if (!reducedMotion) {
           conversationTimer = window.setInterval(() => {
-            if (!document.hidden) refreshConversations(true);
+            if (!document.hidden) {
+              refreshConversations(true);
+              refreshFriendRequests(true);
+            }
           }, 15000);
         }
       }

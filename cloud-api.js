@@ -23,7 +23,10 @@
  *   POST   /api/messages/:id         -> { success, message }
  *   GET    /api/users/lookup?query=  -> { success, found, user }
  *   GET    /api/friends              -> { success, friends }
- *   POST   /api/friends              -> { success, friend }
+ *   GET    /api/friends/requests     -> { success, requests, outgoing }
+ *   POST   /api/friends              -> { success, request, pending }
+ *   POST   /api/friends/requests/accept
+ *   POST   /api/friends/requests/reject
  *   POST   /api/messages/groups      -> { success, conversation }
  *
  * The frontend can be deployed before those data routes exist. In that case
@@ -488,17 +491,63 @@
     return normalizeMessage(data.message || data);
   }
 
-  async function addFriend(friendId) {
+  function normalizeFriendRequest(input, incoming = true) {
+    const raw = input || {};
+    const user = raw.user || raw.requester || raw.sender || raw;
+    return {
+      id: String(raw.id || `${user.id || ""}:${incoming ? "in" : "out"}`),
+      user: {
+        id: String(user.id || user.userId || user.user_id || ""),
+        username: String(user.username || "").slice(0, 64),
+        name: String(user.name || user.displayName || user.display_name || user.username || "用户").slice(0, 64)
+      },
+      createdAt: String(raw.createdAt || raw.created_at || ""),
+      incoming: raw.incoming === undefined ? Boolean(incoming) : Boolean(raw.incoming)
+    };
+  }
+
+  async function sendFriendRequest(friendId) {
     const data = await request("/friends", {
       method: "POST",
       body: { friendId }
     });
     return {
-      ...(data.friend || { id: friendId, name: data.name || friendId }),
+      pending: true,
+      message: String(data.message || "好友申请已发送"),
+      request: normalizeFriendRequest(data.request, false)
+    };
+  }
+
+  async function listFriendRequests() {
+    const data = await request("/friends/requests");
+    const incoming = data.requests || data.incoming || [];
+    const outgoing = data.outgoing || [];
+    return {
+      count: Number(data.count ?? incoming.length) || 0,
+      incoming: incoming.map((item) => normalizeFriendRequest(item, true)),
+      outgoing: outgoing.map((item) => normalizeFriendRequest(item, false))
+    };
+  }
+
+  async function acceptFriendRequest(requesterId) {
+    const data = await request("/friends/requests/accept", {
+      method: "POST",
+      body: { requesterId }
+    });
+    return {
+      friend: data.friend || { id: requesterId },
       conversation: data.conversation
         ? normalizeConversation(data.conversation)
         : null
     };
+  }
+
+  async function rejectFriendRequest(requesterId) {
+    await request("/friends/requests/reject", {
+      method: "POST",
+      body: { requesterId }
+    });
+    return true;
   }
 
   async function lookupFriend(query) {
@@ -609,7 +658,11 @@
     friends: {
       lookup: lookupFriend,
       list: listFriends,
-      add: addFriend
+      add: sendFriendRequest,
+      sendRequest: sendFriendRequest,
+      requests: listFriendRequests,
+      accept: acceptFriendRequest,
+      reject: rejectFriendRequest
     },
     execution: {
       run: executeCode,
