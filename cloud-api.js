@@ -1,5 +1,5 @@
 /*
- * Pellosy cloud adapter
+ * Lumon cloud adapter
  *
  * Cloudflare Pages Functions contract:
  *   GET    /api/session              -> { success, user }

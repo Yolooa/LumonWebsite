@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#fafaf8">
-  <meta name="description" content="Pellosy 个人量化线场">
+  <meta name="description" content="Lumon 个人量化线场">
   <script src="theme-sync.js"></script>
-  <title>Personal Field / Pellosy</title>
+  <title>Personal Field / Lumon</title>
   <style>
     :root {
       --paper: #fafaf8;
@@ -1256,7 +1256,7 @@
 <body data-motion="on">
   <div class="access-gate" id="accessGate" role="status" aria-live="polite">
     <div class="access-gate-copy">
-      <span class="access-gate-mark">P</span>
+      <span class="access-gate-mark">L</span>
       <strong>正在验证私人空间</strong>
       <span class="access-gate-line" aria-hidden="true"></span>
     </div>
@@ -1540,7 +1540,7 @@
         document.title = `${name} / Personal Field`;
         const description = $('meta[name="description"]');
         if (description) {
-          description.setAttribute("content", `${name} 的 Pellosy 个人量化线场`);
+          description.setAttribute("content", `${name} 的 Lumon 个人量化线场`);
         }
       }
 
@@ -2570,7 +2570,7 @@
         const user = await initializeCloudIdentity();
         if (!user || user.guest) {
           $("#accessGate .access-gate-copy").innerHTML = `
-            <span class="access-gate-mark">P</span>
+            <span class="access-gate-mark">L</span>
             <strong>需要登录后访问</strong>
             <span class="access-gate-line" aria-hidden="true"></span>
           `;

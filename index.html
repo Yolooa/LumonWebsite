@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#e8eef5">
-  <meta name="description" content="Pellosy Personal OS">
-  <title>Pellosy / 控制台</title>
+  <meta name="description" content="Lumon Personal OS">
+  <title>Lumon / 控制台</title>
   <style>
     :root {
       color-scheme: light;
@@ -477,7 +477,7 @@
       display: block;
       padding: 0.04em 0 0.02em;
       font-family: Georgia, "Times New Roman", "Songti SC", serif;
-      font-size: clamp(62px, 11.4vw, 164px);
+      font-size: clamp(72px, 15vw, 210px);
       font-weight: 500;
       letter-spacing: 0;
       line-height: 1;
@@ -6281,7 +6281,7 @@
     <div class="ambient-veil"></div>
   </div>
 
-  <div class="boot" id="boot" role="status" aria-live="polite" aria-label="正在进入 Pellosy Personal OS">
+  <div class="boot" id="boot" role="status" aria-live="polite" aria-label="正在进入 Lumon Personal OS">
     <div class="boot-blinds" aria-hidden="true">
       <span></span>
       <span></span>
@@ -6299,7 +6299,7 @@
         <span>LOCAL / PRIVATE / LIVE</span>
       </div>
       <div class="boot-title-mask">
-        <span class="boot-title">PELLOSY</span>
+        <span class="boot-title">LUMON</span>
       </div>
       <div class="boot-meta">
         <span class="boot-phase" id="bootPhase">INITIALIZING FIELD</span>
@@ -6317,15 +6317,15 @@
 
   <header class="topbar reveal" style="--delay: 40ms">
     <div class="topbar-inner">
-      <a class="brand" href="#top" aria-label="Pellosy 控制台首页">
+      <a class="brand" href="#top" aria-label="Lumon 控制台首页">
         <span class="brand-mark">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M7.4 18.8V5.2h6.3c3.3 0 5.4 2 5.4 5.1s-2.1 5.1-5.4 5.1h-3.4v3.4H7.4Zm2.9-6.1h3.2c1.7 0 2.7-.9 2.7-2.4s-1-2.4-2.7-2.4h-3.2v4.8Z" fill="currentColor"/>
+            <path d="M7.8 4.8h3v11h6.1v3H7.8z" fill="currentColor"/>
             <circle cx="17.9" cy="6.3" r="1.35" fill="#f26f4a"/>
           </svg>
         </span>
         <span class="brand-copy">
-          <strong data-text-wave>PELLOSY</strong>
+          <strong data-text-wave>LUMON</strong>
           <small>PERSONAL OS</small>
         </span>
       </a>
@@ -6411,7 +6411,7 @@
         </div>
         <p class="daily-quote" id="dailyQuote">
           <span class="quote-copy" id="dailyQuoteText">把注意力放在真正重要的事情上。</span>
-          <cite id="dailyQuoteAuthor">— Pellosy Daily</cite>
+          <cite id="dailyQuoteAuthor">— Lumon Daily</cite>
         </p>
       </div>
 
@@ -6894,7 +6894,7 @@
   <div class="dynamic-island" id="dynamicIsland" role="status" aria-live="polite" aria-atomic="true">
     <div class="island-compact-view" aria-hidden="true">
       <span class="island-camera-dot"></span>
-      <span class="island-compact-copy"><strong id="islandCompactTitle">PELLOSY</strong></span>
+      <span class="island-compact-copy"><strong id="islandCompactTitle">LUMON</strong></span>
       <span class="island-wave"><i></i><i></i><i></i></span>
     </div>
     <div class="island-expanded-view">
@@ -7353,17 +7353,17 @@
           { text: "在寒冬深处，我终于明白，我身上有一个不可战胜的夏天。", author: "加缪" },
           { text: "不必匆忙，不必闪耀，只需成为自己。", author: "弗吉尼亚·伍尔夫" },
           { text: "把一件小事做完，比把十件大事想完更接近自由。", author: "今日摘录" },
-          { text: "专注不是拒绝世界，而是暂时选择世界的某一部分。", author: "Pellosy Daily" },
+          { text: "专注不是拒绝世界，而是暂时选择世界的某一部分。", author: "Lumon Daily" },
           { text: "先让事情变清楚，再让事情变漂亮。", author: currentUser.name || "访客" },
-          { text: "你不需要追赶时间，只需要不再把它交给无关紧要的事。", author: "Pellosy Daily" },
+          { text: "你不需要追赶时间，只需要不再把它交给无关紧要的事。", author: "Lumon Daily" },
           { text: "好奇心不是分心，它只是尚未命名的方向。", author: "今日摘录" },
           { text: "完成之后，再决定它是否值得完美。", author: currentUser.name || "访客" },
-          { text: "安静不是空白，是注意力终于有了形状。", author: "Pellosy Daily" },
+          { text: "安静不是空白，是注意力终于有了形状。", author: "Lumon Daily" },
           { text: "每个清楚的下一步，都是对未来的一次简短回答。", author: "今日摘录" },
-          { text: "把重复的事交给系统，把判断留给自己。", author: "Pellosy Daily" },
+          { text: "把重复的事交给系统，把判断留给自己。", author: "Lumon Daily" },
           { text: "不是每一天都要向前冲，有些日子只需要站稳。", author: currentUser.name || "访客" },
           { text: "真正的秩序，不是所有东西都整齐，而是你知道什么最重要。", author: "今日摘录" },
-          { text: "当你不知道从哪里开始时，就从最小的真实动作开始。", author: "Pellosy Daily" }
+          { text: "当你不知道从哪里开始时，就从最小的真实动作开始。", author: "Lumon Daily" }
         ];
 
         const now = new Date();
@@ -9306,7 +9306,7 @@
         focusToggleIcon.setAttribute("href", "#i-pause");
         stopFocusInterval();
         focusInterval = window.setInterval(tickFocus, 250);
-        document.title = `${formatTime(remaining)} · Pellosy Focus`;
+        document.title = `${formatTime(remaining)} · Lumon Focus`;
       }
 
       function pauseFocus() {
@@ -9876,13 +9876,13 @@
         {
           group: "Navigate",
           title: "私聊与好友",
-          detail: "打开 Pellosy Messages",
+          detail: "打开 Lumon Messages",
           icon: "message-circle",
           key: "M",
           keywords: "messages chat friend group 私聊 好友 群聊",
           action: () => {
             closeCommand();
-            transitionTo("messagessend.html", "PELLOSY MESSAGES");
+            transitionTo("messagessend.html", "LUMON MESSAGES");
           }
         },
         {
@@ -10098,7 +10098,7 @@
           } else if (action === "theme") {
             cycleTheme();
           } else if (action === "messages") {
-            transitionTo("messagessend.html", "PELLOSY MESSAGES");
+            transitionTo("messagessend.html", "LUMON MESSAGES");
           }
         });
       });
@@ -10108,7 +10108,7 @@
           return;
         }
         event.preventDefault();
-        transitionTo("messagessend.html", "PELLOSY MESSAGES");
+        transitionTo("messagessend.html", "LUMON MESSAGES");
       });
 
       $("#avatarButton").addEventListener("click", () => {

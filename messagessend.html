@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#efeee9">
-  <meta name="description" content="Pellosy private messages">
+  <meta name="description" content="Lumon private messages">
   <script src="theme-sync.js"></script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Cpath d='M23 47V17h12c8 0 13 4 13 11s-5 11-13 11h-5v8H23Zm7-15h5c4 0 6-1 6-4s-2-4-6-4h-5v8Z' fill='%23e5ff00'/%3E%3C/svg%3E">
-  <title>私聊 / Pellosy</title>
+  <title>私聊 / Lumon</title>
   <style>
     :root {
       --paper: #efeee9;
@@ -1716,7 +1716,7 @@
 <body>
   <div class="access-gate" id="accessGate" role="status" aria-live="polite">
     <div class="gate-copy">
-      <span class="gate-mark">P</span>
+      <span class="gate-mark">L</span>
       <strong>正在验证私聊空间</strong>
       <span class="gate-line" aria-hidden="true"></span>
     </div>
@@ -1730,10 +1730,10 @@
 
   <div class="app">
     <header class="topbar">
-      <a class="brand" href="index.html" data-route aria-label="返回 Pellosy 控制台">
-        <span class="brand-mark">P</span>
+      <a class="brand" href="index.html" data-route aria-label="返回 Lumon 控制台">
+        <span class="brand-mark">L</span>
         <span class="brand-copy">
-          <strong>PELLOSY MESSAGES</strong>
+          <strong>LUMON MESSAGES</strong>
           <small>PRIVATE / CLOUDFLARE</small>
         </span>
       </a>
@@ -2625,7 +2625,7 @@
           const resolved = await cloud.loadSession();
           if (!resolved || resolved.guest) {
             $("#accessGate .gate-copy").innerHTML = `
-              <span class="gate-mark">P</span>
+              <span class="gate-mark">L</span>
               <strong>需要登录后访问</strong>
               <span class="gate-line" aria-hidden="true"></span>
             `;
