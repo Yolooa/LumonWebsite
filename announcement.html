@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="glass">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e8eef5">
+  <meta name="description" content="Lumonsky announcements">
+  <script src="theme-sync.js"></script>
+  <title>公告 / Lumonsky</title>
+  <style>
+    :root {
+      --paper: #e8eef5;
+      --ink: #131923;
+      --muted: #6b7786;
+      --line: rgba(19, 25, 35, 0.14);
+      --line-strong: rgba(19, 25, 35, 0.24);
+      --accent: #f26f4a;
+      --accent-rgb: 242, 111, 74;
+      --blue: #3868ed;
+      --green: #3c7d51;
+      --red: #b7352d;
+      --surface: rgba(255, 255, 255, 0.56);
+      --surface-strong: rgba(255, 255, 255, 0.76);
+      --sans: "Google Sans Flex", "Helvetica Neue", Helvetica, Arial,
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      --serif: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --spring: cubic-bezier(0.2, 1.35, 0.35, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-width: 320px;
+      background: var(--paper);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(133deg, transparent 0 58%, rgba(var(--accent-rgb), 0.11) 58% 66%, transparent 66%),
+        var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      transition: color 0.3s ease, background-color 0.3s ease;
+    }
+
+    body::before {
+      content: "NOTICE";
+      position: fixed;
+      right: -2vw;
+      bottom: -8vh;
+      z-index: -1;
+      color: transparent;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(150px, 28vw, 470px);
+      font-weight: 900;
+      line-height: 0.8;
+      -webkit-text-stroke: 1px var(--line);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .opening-curtain {
+      position: fixed;
+      inset: 0;
+      z-index: 5000;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      overflow: hidden;
+      background: transparent;
+      pointer-events: auto;
+    }
+
+    .opening-curtain span {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 35%),
+        var(--paper);
+      border-right: 1px solid var(--line);
+      transform: translateY(0);
+      transition: transform 0.72s var(--ease);
+    }
+
+    .opening-curtain span:nth-child(1),
+    .opening-curtain span:nth-child(5) {
+      transition-delay: 0.02s;
+    }
+
+    .opening-curtain span:nth-child(2),
+    .opening-curtain span:nth-child(4) {
+      transition-delay: 0.08s;
+    }
+
+    .opening-curtain span:nth-child(3) {
+      transition-delay: 0.14s;
+    }
+
+    .opening-curtain.is-leaving span {
+      transform: translateY(-101%);
+    }
+
+    .opening-copy {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 12px;
+      color: var(--ink);
+      text-align: center;
+      transition: opacity 0.34s ease, transform 0.42s var(--ease);
+    }
+
+    .opening-curtain.is-leaving .opening-copy {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+
+    .opening-mark {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 24px;
+      animation: openingMark 0.8s var(--spring) both;
+    }
+
+    .opening-copy strong {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+    }
+
+    .opening-copy small {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .opening-count {
+      min-width: 72px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    body.is-opening {
+      overflow-y: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .icon-sm {
+      width: 13px;
+      height: 13px;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 1500;
+      height: 2px;
+      pointer-events: none;
+    }
+
+    .scroll-progress i {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+
+    .page {
+      width: min(100% - 38px, 1320px);
+      margin: 0 auto;
+      padding-bottom: 60px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      display: flex;
+      min-height: 66px;
+      align-items: center;
+      gap: 12px;
+      padding: 0 4px;
+      background: color-mix(in srgb, var(--paper) 78%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(24px) saturate(1.5);
+      -webkit-backdrop-filter: blur(24px) saturate(1.5);
+      transition: box-shadow 0.28s ease;
+    }
+
+    .site-header.is-scrolled {
+      box-shadow: 0 14px 36px rgba(20, 30, 42, 0.1);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .brand-copy {
+      display: grid;
+      gap: 1px;
+    }
+
+    .brand-copy strong {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-copy span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .pill-button,
+    .tool-button {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 12px;
+      color: var(--text-soft, var(--ink));
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 650;
+      transition:
+        color 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.24s var(--spring);
+    }
+
+    .tool-button {
+      width: 34px;
+      padding: 0;
+    }
+
+    .pill-button:hover,
+    .tool-button:hover {
+      color: var(--ink);
+      background: var(--surface-strong);
+      border-color: var(--line-strong);
+      transform: translateY(-1px);
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 28px;
+      padding: clamp(54px, 8vw, 106px) 0 34px;
+    }
+
+    .intro-label {
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .intro h1 {
+      position: relative;
+      display: grid;
+      width: min(100%, 920px);
+      min-height: clamp(260px, 34vw, 430px);
+      align-content: center;
+      gap: 0;
+      line-height: 0.78;
+    }
+
+    .ghost-word {
+      display: inline-flex;
+      width: max-content;
+      max-width: 100%;
+      min-height: 0.9em;
+      align-items: center;
+      color: transparent;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(96px, 18vw, 260px);
+      font-weight: 900;
+      letter-spacing: -0.045em;
+      -webkit-text-stroke: 1.5px var(--ink);
+      white-space: nowrap;
+    }
+
+    .headline-typing {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .poster-caret {
+      display: inline-block;
+      width: 0.055em;
+      height: 0.68em;
+      margin-left: 0.045em;
+      background: currentColor;
+      opacity: 0;
+      vertical-align: 0.02em;
+    }
+
+    .ghost-word .poster-caret {
+      color: var(--ink);
+    }
+
+    .solid-word.is-typing .poster-caret,
+    .ghost-word.is-typing .poster-caret {
+      opacity: 1;
+      animation: caretBlink 0.72s steps(1) infinite;
+    }
+
+    .solid-word {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      width: max-content;
+      margin-top: -0.34em;
+      margin-left: clamp(28px, 7vw, 100px);
+      padding: 0.08em 0.14em 0.13em;
+      color: var(--paper);
+      background: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(62px, 11vw, 150px);
+      font-weight: 600;
+      letter-spacing: -0.05em;
+      line-height: 0.92;
+      min-width: 2.15em;
+      min-height: 1.05em;
+      align-items: center;
+    }
+
+    .solid-word .solid-dot {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .poster-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 0.3em;
+      color: var(--accent);
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.6vw, 36px);
+      font-style: italic;
+      line-height: 1;
+      opacity: 0;
+      transform: translateX(-20px);
+      animation: posterLine 0.72s 1.54s var(--ease) forwards;
+    }
+
+    .poster-line::before {
+      content: "";
+      width: clamp(36px, 8vw, 110px);
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .intro-meta {
+      display: grid;
+      justify-items: end;
+      gap: 5px;
+      padding-bottom: 10px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+      text-align: right;
+    }
+
+    .intro-meta strong {
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .ticker {
+      display: flex;
+      min-height: 42px;
+      align-items: center;
+      overflow: hidden;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 999px;
+    }
+
+    [data-theme="night"] .ticker {
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    .ticker-label {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      height: 42px;
+      align-items: center;
+      padding: 0 17px;
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ticker-track {
+      display: flex;
+      min-width: max-content;
+      align-items: center;
+      gap: 34px;
+      padding-left: 22px;
+      animation: tickerMove 30s linear infinite;
+    }
+
+    .ticker:hover .ticker-track {
+      animation-play-state: paused;
+    }
+
+    .ticker-track span {
+      font-family: var(--mono);
+      font-size: 8px;
+      white-space: nowrap;
+    }
+
+    .ticker-track i {
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 15px;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      backdrop-filter: blur(20px);
+    }
+
+    .category-list {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .category-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-button {
+      min-height: 31px;
+      padding: 0 11px;
+      color: var(--muted);
+      border-radius: 999px;
+      font-size: 8px;
+      white-space: nowrap;
+    }
+
+    .category-button[aria-selected="true"] {
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+    }
+
+    .search-box {
+      position: relative;
+      width: min(230px, 34vw);
+      margin-left: auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      height: 32px;
+      padding: 0 10px 0 30px;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      outline: none;
+      font-size: 8px;
+    }
+
+    .search-box .icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      color: var(--muted);
+      transform: translateY(-50%);
+    }
+
+    .announcement-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .announcement-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .announcement-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr) auto;
+      gap: 16px;
+      padding: 20px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      backdrop-filter: blur(22px) saturate(1.4);
+      -webkit-backdrop-filter: blur(22px) saturate(1.4);
+      transition:
+        transform 0.3s var(--spring),
+        border-color 0.24s ease,
+        box-shadow 0.24s ease;
+      --spot-x: 50%;
+      --spot-y: 50%;
+    }
+
+    .announcement-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle 170px at var(--spot-x) var(--spot-y),
+        rgba(var(--accent-rgb), 0.18),
+        transparent 68%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s ease;
+    }
+
+    .announcement-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--line-strong);
+      box-shadow: 0 18px 48px rgba(20, 30, 42, 0.1);
+    }
+
+    .announcement-card:hover::before {
+      opacity: 1;
+    }
+
+    .announcement-index {
+      position: relative;
+      z-index: 1;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .announcement-copy {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      min-width: 0;
+      gap: 7px;
+    }
+
+    .announcement-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .announcement-tag {
+      padding: 3px 7px;
+      color: var(--accent);
+      background: rgba(var(--accent-rgb), 0.1);
+      border-radius: 999px;
+    }
+
+    .announcement-card h2 {
+      font-size: clamp(20px, 2.6vw, 34px);
+      font-weight: 650;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .announcement-card p {
+      display: -webkit-box;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.7;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .announcement-side {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      align-content: space-between;
+      justify-items: end;
+      gap: 14px;
+    }
+
+    .announcement-side time {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      white-space: nowrap;
+    }
+
+    .round-arrow {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      transition: color 0.2s ease, background 0.2s ease, transform 0.24s var(--spring);
+    }
+
+    .announcement-card:hover .round-arrow {
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+      border-color: var(--accent);
+      transform: rotate(-8deg);
+    }
+
+    .announcement-card.is-read {
+      opacity: 0.7;
+    }
+
+    .announcement-card.is-pinned {
+      border-color: rgba(var(--accent-rgb), 0.44);
+    }
+
+    .side-panel {
+      position: sticky;
+      top: 84px;
+      align-self: start;
+      display: grid;
+      gap: 9px;
+    }
+
+    .info-panel {
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      backdrop-filter: blur(20px);
+    }
+
+    .info-panel > span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      letter-spacing: 0.07em;
+    }
+
+    .info-panel h3 {
+      margin-top: 7px;
+      font-size: 18px;
+    }
+
+    .info-panel p {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.65;
+    }
+
+    .info-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 13px;
+    }
+
+    .info-stat {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    .info-stat strong {
+      display: block;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .info-stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 7px;
+    }
+
+    .empty-state {
+      display: grid;
+      min-height: 330px;
+      place-content: center;
+      justify-items: center;
+      gap: 7px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-align: center;
+      font-size: 9px;
+    }
+
+    .empty-state strong {
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .reveal-pending {
+      opacity: 0;
+      transform: translateY(16px) scale(0.99);
+    }
+
+    .reveal-ready {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity 0.58s var(--ease),
+        transform 0.62s var(--spring),
+        border-color 0.24s ease,
+        box-shadow 0.24s ease;
+    }
+
+    dialog {
+      width: min(690px, calc(100vw - 24px));
+      max-height: min(760px, calc(100vh - 24px));
+      margin: auto;
+      padding: 0;
+      color: var(--ink);
+      background: var(--surface-strong);
+      border: 1px solid var(--line-strong);
+      border-radius: 9px;
+      box-shadow: 0 28px 90px rgba(20, 30, 42, 0.3);
+      backdrop-filter: blur(32px) saturate(1.45);
+      -webkit-backdrop-filter: blur(32px) saturate(1.45);
+    }
+
+    dialog::backdrop {
+      background: rgba(14, 22, 31, 0.42);
+      backdrop-filter: blur(6px);
+    }
+
+    dialog[open] {
+      animation: dialogIn 0.36s var(--spring) both;
+    }
+
+    .dialog-inner {
+      max-height: min(760px, calc(100vh - 24px));
+      padding: 22px;
+      overflow-y: auto;
+    }
+
+    .dialog-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dialog-head span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .dialog-head h2 {
+      margin-top: 7px;
+      font-size: clamp(24px, 4vw, 40px);
+      line-height: 1.08;
+    }
+
+    .dialog-close {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      flex: 0 0 auto;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+
+    .detail-content {
+      margin-top: 18px;
+      color: var(--text-soft, var(--ink));
+      font-size: 13px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+
+    .detail-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 7px;
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .dialog-button {
+      min-height: 34px;
+      padding: 0 13px;
+      color: var(--text-soft, var(--ink));
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 650;
+    }
+
+    .dialog-button.is-primary {
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .admin-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .admin-form label {
+      color: var(--muted);
+      font-size: 8px;
+    }
+
+    .admin-form input,
+    .admin-form textarea,
+    .admin-form select {
+      width: 100%;
+      padding: 10px 11px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      font-size: 10px;
+    }
+
+    .admin-form textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.7;
+    }
+
+    .admin-form input:focus,
+    .admin-form textarea:focus,
+    .admin-form select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+    }
+
+    .admin-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 8px;
+    }
+
+    .admin-status {
+      min-height: 18px;
+      color: var(--muted);
+      font-size: 8px;
+    }
+
+    .admin-status.is-error {
+      color: var(--red);
+    }
+
+    .admin-status.is-success {
+      color: var(--green);
+    }
+
+    .toast {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      z-index: 3000;
+      min-width: 190px;
+      max-width: min(420px, calc(100vw - 24px));
+      padding: 9px 14px;
+      color: #fff;
+      background: #050505;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 999px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.26);
+      font-size: 8px;
+      text-align: center;
+      opacity: 0;
+      transform: translate(-50%, -15px) scale(0.9);
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.42s var(--spring);
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    @keyframes caretBlink {
+      0%, 48% { opacity: 1; }
+      49%, 100% { opacity: 0; }
+    }
+
+    @keyframes openingMark {
+      from { opacity: 0; transform: scale(0.72) rotate(-8deg); }
+      to { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
+    @keyframes posterLetter {
+      from {
+        opacity: 0;
+        transform: translateY(0.55em) rotate(3deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotate(0);
+      }
+    }
+
+    @keyframes posterSolid {
+      to { clip-path: inset(0 0 0 0); }
+    }
+
+    @keyframes posterLine {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes tickerMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    @keyframes dialogIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 900px) {
+      .announcement-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .side-panel {
+        position: static;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: calc(100% - 22px);
+      }
+
+      .site-header {
+        min-height: 58px;
+      }
+
+      .brand-copy span,
+      .header-actions .pill-button span {
+        display: none;
+      }
+
+      .intro {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+        padding-top: 48px;
+      }
+
+      .intro h1 {
+        min-height: 220px;
+      }
+
+      .ghost-word {
+        font-size: clamp(68px, 22vw, 94px);
+        letter-spacing: -0.055em;
+      }
+
+      .solid-word {
+        margin-left: 18px;
+        font-size: clamp(48px, 16vw, 68px);
+      }
+
+      .poster-line {
+        font-size: 19px;
+      }
+
+      .intro-meta {
+        justify-items: start;
+        text-align: left;
+      }
+
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .announcement-card {
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 10px;
+        padding: 15px;
+      }
+
+      .announcement-side {
+        grid-column: 2;
+        grid-row: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .side-panel {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .dialog-inner {
+        padding: 18px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="opening-curtain" id="openingCurtain" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <div class="opening-copy">
+      <span class="opening-mark">A</span>
+      <strong>LUMONSKY / PUBLIC BULLETIN</strong>
+      <small>正在同步公告信号</small>
+      <span class="opening-count" id="openingCount">000</span>
+    </div>
+  </div>
+  <div class="scroll-progress" aria-hidden="true"><i id="scrollProgress"></i></div>
+  <div class="page">
+    <header class="site-header" id="siteHeader">
+      <a class="brand" href="index.html" data-home-link aria-label="返回 Lumonsky 控制台">
+        <span class="brand-mark">A</span>
+        <span class="brand-copy">
+          <strong>LUMONSKY / ANNOUNCEMENTS</strong>
+          <span>PUBLIC NOTICE STREAM</span>
+        </span>
+      </a>
+      <div class="header-actions">
+        <button class="tool-button" id="themeButton" type="button" aria-label="切换主题">
+          <svg class="icon"><use href="#i-sun"></use></svg>
+        </button>
+        <button class="pill-button" id="manageButton" type="button">
+          <svg class="icon icon-sm"><use href="#i-edit"></use></svg>
+          <span>发布公告</span>
+        </button>
+        <a class="pill-button" href="index.html" data-home-link>
+          <span>返回控制台</span>
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <p class="intro-label">PUBLIC NOTICE / SYSTEM / PRODUCT / MAINTENANCE</p>
+          <h1 aria-label="公告：重要变化，集中发布。">
+            <span class="ghost-word" aria-hidden="true">
+              <span class="headline-typing" id="noticeGhostText">NOTICE</span><i class="poster-caret"></i>
+            </span>
+            <span class="solid-word" aria-hidden="true">
+              <span class="headline-typing" id="noticeSolidText">公告</span><i class="solid-dot">.</i><i class="poster-caret"></i>
+            </span>
+            <span class="poster-line">重要变化，集中发布。</span>
+          </h1>
+        </div>
+        <div class="intro-meta">
+          <span>同步自 Cloudflare D1</span>
+          <strong id="noticeTotal">00</strong>
+          <span id="noticeUpdated">等待读取</span>
+        </div>
+      </section>
+
+      <section class="ticker" aria-label="最新公告">
+        <span class="ticker-label">LATEST</span>
+        <div class="ticker-track" id="tickerTrack"></div>
+      </section>
+
+      <section class="toolbar" aria-label="公告筛选">
+        <div class="category-list" id="categoryList" role="tablist"></div>
+        <label class="search-box">
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <input id="noticeSearch" type="search" placeholder="搜索公告">
+        </label>
+      </section>
+
+      <div class="announcement-layout">
+        <section class="announcement-list" id="announcementList" aria-live="polite"></section>
+        <aside class="side-panel">
+          <section class="info-panel">
+            <span>NOTICE / STATUS</span>
+            <h3>公告中心</h3>
+            <p>系统更新、维护计划、功能发布和重要说明会统一发布在这里。阅读状态保存在当前浏览器。</p>
+            <div class="info-stats">
+              <div class="info-stat"><strong id="statAll">0</strong><span>公告总数</span></div>
+              <div class="info-stat"><strong id="statUnread">0</strong><span>未读公告</span></div>
+            </div>
+          </section>
+          <section class="info-panel">
+            <span>LOCAL / READ STATE</span>
+            <h3>已读进度</h3>
+            <p id="readProgressText">0% 的公告已阅读</p>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="detailDialog">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <div>
+          <span id="detailCategory">ANNOUNCEMENT</span>
+          <h2 id="detailTitle">公告</h2>
+        </div>
+        <button class="dialog-close" id="detailClose" type="button" aria-label="关闭">
+          <svg class="icon"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="detail-meta">
+        <span id="detailTime"></span>
+        <span id="detailPinned"></span>
+      </div>
+      <div class="detail-content" id="detailContent"></div>
+      <div class="detail-actions">
+        <button class="dialog-button" id="detailDelete" type="button" hidden>删除公告</button>
+        <button class="dialog-button is-primary" id="detailDone" type="button">知道了</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="adminDialog">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <div>
+          <span>ADMIN / PUBLISH</span>
+          <h2>发布公告</h2>
+        </div>
+        <button class="dialog-close" id="adminClose" type="button" aria-label="关闭">
+          <svg class="icon"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <form class="admin-form" id="adminForm">
+        <label for="adminPassword">管理口令</label>
+        <input id="adminPassword" type="password" maxlength="256" autocomplete="current-password" placeholder="DASHBOARD_PASSWORD">
+        <label for="adminTitle">标题</label>
+        <input id="adminTitle" type="text" maxlength="140" placeholder="公告标题" required>
+        <label for="adminCategory">分类</label>
+        <select id="adminCategory">
+          <option>系统</option>
+          <option>功能</option>
+          <option>维护</option>
+          <option>活动</option>
+          <option>公告</option>
+        </select>
+        <label for="adminSummary">摘要</label>
+        <input id="adminSummary" type="text" maxlength="240" placeholder="列表页显示的简短摘要">
+        <label for="adminContent">正文</label>
+        <textarea id="adminContent" maxlength="12000" placeholder="公告完整内容" required></textarea>
+        <label class="admin-inline"><input id="adminPinned" type="checkbox">置顶公告</label>
+        <p class="admin-status" id="adminStatus" aria-live="polite"></p>
+        <div class="detail-actions">
+          <button class="dialog-button" id="adminCancel" type="button">取消</button>
+          <button class="dialog-button is-primary" type="submit">发布</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </svg>
+
+  <script src="visit-track.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector, scope = document) => scope.querySelector(selector);
+      const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+      const TOKEN_KEY = "lumon.dashviewer.token";
+      const READ_KEY = "lumon.announcements.read.v1";
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const state = {
+        announcements: [],
+        category: "全部",
+        query: "",
+        active: null,
+        token: "",
+        toastTimer: 0
+      };
+
+      function parseDate(value) {
+        let text = String(value || "");
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(text)) text = `${text.replace(" ", "T")}Z`;
+        const date = new Date(text);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      function formatDate(value) {
+        const date = parseDate(value);
+        if (!date) return "时间未知";
+        return date.toLocaleString("zh-CN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        });
+      }
+
+      function timeAgo(value) {
+        const date = parseDate(value);
+        if (!date) return "未知";
+        const diff = Date.now() - date.getTime();
+        if (diff < 60000) return "刚刚";
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
+        return `${Math.floor(diff / 86400000)} 天前`;
+      }
+
+      function readIds() {
+        try {
+          return new Set(JSON.parse(localStorage.getItem(READ_KEY) || "[]"));
+        } catch {
+          return new Set();
+        }
+      }
+
+      function markRead(id) {
+        const ids = readIds();
+        ids.add(id);
+        try {
+          localStorage.setItem(READ_KEY, JSON.stringify([...ids]));
+        } catch {}
+      }
+
+      function showToast(message) {
+        const node = $("#toast");
+        node.textContent = message;
+        node.classList.add("is-visible");
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => node.classList.remove("is-visible"), 2400);
+      }
+
+      function filtered() {
+        const query = state.query.toLowerCase();
+        return state.announcements.filter((item) => {
+          const categoryMatch = state.category === "全部" || item.category === state.category;
+          const searchMatch = !query || [
+            item.title,
+            item.summary,
+            item.content,
+            item.category
+          ].join(" ").toLowerCase().includes(query);
+          return categoryMatch && searchMatch;
+        });
+      }
+
+      function renderTicker() {
+        const track = $("#tickerTrack");
+        const titles = state.announcements.slice(0, 10).map((item) => item.title);
+        if (!titles.length) {
+          track.innerHTML = "<span>暂无公告</span><i></i><span>发布后会显示在这里</span>";
+          return;
+        }
+        track.replaceChildren();
+        [...titles, ...titles].forEach((title) => {
+          const span = document.createElement("span");
+          span.textContent = title;
+          const dot = document.createElement("i");
+          track.append(span, dot);
+        });
+      }
+
+      function renderCategories() {
+        const list = $("#categoryList");
+        const categories = ["全部", ...new Set(state.announcements.map((item) => item.category || "公告"))];
+        list.replaceChildren();
+        categories.forEach((category) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "category-button";
+          button.setAttribute("role", "tab");
+          button.setAttribute("aria-selected", String(category === state.category));
+          button.textContent = category;
+          button.addEventListener("click", () => {
+            state.category = category;
+            renderCategories();
+            renderList();
+          });
+          list.appendChild(button);
+        });
+      }
+
+      function renderStats() {
+        const read = readIds();
+        const unread = state.announcements.filter((item) => !read.has(item.id)).length;
+        const progress = state.announcements.length
+          ? Math.round((state.announcements.length - unread) / state.announcements.length * 100)
+          : 0;
+        $("#noticeTotal").textContent = String(state.announcements.length).padStart(2, "0");
+        $("#statAll").textContent = String(state.announcements.length);
+        $("#statUnread").textContent = String(unread);
+        $("#readProgressText").textContent = `${progress}% 的公告已阅读`;
+      }
+
+      function createCard(item, index) {
+        const read = readIds().has(item.id);
+        const card = document.createElement("article");
+        card.className = `announcement-card${read ? " is-read" : ""}${item.pinned ? " is-pinned" : ""}`;
+        card.tabIndex = 0;
+        card.dataset.id = item.id;
+        card.innerHTML = `
+          <span class="announcement-index">${String(index + 1).padStart(2, "0")}</span>
+          <span class="announcement-copy">
+            <span class="announcement-tags"><span class="announcement-tag"></span><span class="announcement-read"></span></span>
+            <h2></h2>
+            <p></p>
+          </span>
+          <span class="announcement-side">
+            <time></time>
+            <span class="round-arrow"><svg class="icon icon-sm"><use href="#i-arrow"></use></svg></span>
+          </span>
+        `;
+        $(".announcement-tag", card).textContent = item.category || "公告";
+        $(".announcement-read", card).textContent = read ? "已读" : item.pinned ? "置顶 / 未读" : "未读";
+        $("h2", card).textContent = item.title;
+        $("p", card).textContent = item.summary || item.content;
+        $("time", card).textContent = timeAgo(item.created_at);
+        const open = () => openDetail(item);
+        card.addEventListener("click", open);
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            open();
+          }
+        });
+        card.addEventListener("pointermove", (event) => {
+          if (reducedMotion || matchMedia("(pointer: coarse)").matches) return;
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty("--spot-x", `${event.clientX - rect.left}px`);
+          card.style.setProperty("--spot-y", `${event.clientY - rect.top}px`);
+        });
+        return card;
+      }
+
+      function renderList() {
+        const list = $("#announcementList");
+        const items = filtered();
+        list.replaceChildren();
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = "<strong>暂无匹配公告</strong><span>调整分类或搜索条件后再试</span>";
+          list.appendChild(empty);
+          return;
+        }
+        items.forEach((item, index) => {
+          const card = createCard(item, index);
+          list.appendChild(card);
+        });
+        bindReveal();
+      }
+
+      function openDetail(item) {
+        state.active = item;
+        markRead(item.id);
+        $("#detailCategory").textContent = `${item.category || "公告"} / ANNOUNCEMENT`;
+        $("#detailTitle").textContent = item.title;
+        $("#detailTime").textContent = formatDate(item.created_at);
+        $("#detailPinned").textContent = item.pinned ? "PINNED" : "";
+        $("#detailContent").textContent = item.content;
+        $("#detailDelete").hidden = !state.token;
+        $("#detailDialog").showModal();
+        renderStats();
+        renderList();
+      }
+
+      function initializeHeadlineTyping() {
+        const ghost = $("#noticeGhostText");
+        const solid = $("#noticeSolidText");
+        const ghostLine = ghost?.closest(".ghost-word");
+        const solidLine = solid?.closest(".solid-word");
+        if (!ghost || !solid || !ghostLine || !solidLine) return;
+        const phrases = [
+          ["NOTICE", "公告"],
+          ["BULLETIN", "更新"],
+          ["UPDATES", "说明"]
+        ];
+        if (reducedMotion) {
+          ghost.textContent = phrases[0][0];
+          solid.textContent = phrases[0][1];
+          return;
+        }
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+        const active = (line) => {
+          ghostLine.classList.toggle("is-typing", line === ghostLine);
+          solidLine.classList.toggle("is-typing", line === solidLine);
+        };
+        const type = async (node, line, text) => {
+          active(line);
+          node.textContent = "";
+          for (const character of text) {
+            node.textContent += character;
+            await wait(58 + Math.random() * 62);
+          }
+        };
+        const erase = async (node, line) => {
+          active(line);
+          while (node.textContent.length) {
+            node.textContent = node.textContent.slice(0, -1);
+            await wait(30 + Math.random() * 36);
+          }
+        };
+        (async () => {
+          let index = 0;
+          await wait(1900);
+          ghost.textContent = "";
+          solid.textContent = "";
+          while (true) {
+            const pair = phrases[index % phrases.length];
+            await type(ghost, ghostLine, pair[0]);
+            await wait(140);
+            await type(solid, solidLine, pair[1]);
+            await wait(1900);
+            await erase(solid, solidLine);
+            await wait(130);
+            await erase(ghost, ghostLine);
+            ghostLine.classList.remove("is-typing");
+            solidLine.classList.remove("is-typing");
+            await wait(360);
+            index += 1;
+          }
+        })();
+      }
+
+      function bindReveal() {
+        if (reducedMotion || !("IntersectionObserver" in window)) return;
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.remove("reveal-pending");
+            entry.target.classList.add("reveal-ready");
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.06 });
+        $$(".announcement-card:not(.reveal-ready):not(.reveal-pending)").forEach((card, index) => {
+          card.style.transitionDelay = `${Math.min(index * 55, 220)}ms`;
+          card.classList.add("reveal-pending");
+          observer.observe(card);
+        });
+      }
+
+      function bindScrollMotion() {
+        const progress = $("#scrollProgress");
+        const header = $("#siteHeader");
+        let frame = 0;
+        const update = () => {
+          frame = 0;
+          const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+          progress.style.transform = `scaleX(${Math.min(1, Math.max(0, scrollY / max))})`;
+          header.classList.toggle("is-scrolled", scrollY > 12);
+        };
+        addEventListener("scroll", () => {
+          if (!frame) frame = requestAnimationFrame(update);
+        }, { passive: true });
+        update();
+      }
+
+      async function loadAnnouncements() {
+        try {
+          const response = await fetch("/api/announcements", { cache: "no-store" });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.success === false) {
+            throw new Error(data.message || `HTTP ${response.status}`);
+          }
+          state.announcements = Array.isArray(data.announcements) ? data.announcements : [];
+          $("#noticeUpdated").textContent = `更新于 ${new Date().toLocaleTimeString("zh-CN", { hour12: false })}`;
+          renderTicker();
+          renderCategories();
+          renderStats();
+          renderList();
+        } catch (error) {
+          $("#announcementList").innerHTML = `<div class="empty-state"><strong>公告读取失败</strong><span>${String(error.message || error)}</span></div>`;
+          $("#noticeUpdated").textContent = "同步失败";
+        }
+      }
+
+      async function publishAnnouncement(event) {
+        event.preventDefault();
+        const password = $("#adminPassword").value;
+        const status = $("#adminStatus");
+        if (!password) {
+          status.textContent = "请输入管理口令";
+          status.className = "admin-status is-error";
+          return;
+        }
+        status.textContent = "正在发布公告…";
+        status.className = "admin-status";
+        try {
+          const response = await fetch("/api/announcements", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Dashboard-Token": password
+            },
+            body: JSON.stringify({
+              title: $("#adminTitle").value.trim(),
+              category: $("#adminCategory").value,
+              summary: $("#adminSummary").value.trim(),
+              content: $("#adminContent").value.trim(),
+              pinned: $("#adminPinned").checked
+            })
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.success === false) {
+            throw new Error(data.message || `发布失败 (${response.status})`);
+          }
+          try {
+            sessionStorage.setItem(TOKEN_KEY, password);
+          } catch {}
+          state.token = password;
+          status.textContent = "公告已发布";
+          status.className = "admin-status is-success";
+          $("#adminForm").reset();
+          $("#adminPassword").value = password;
+          await loadAnnouncements();
+          showToast("公告已发布");
+        } catch (error) {
+          status.textContent = error.message || "发布失败";
+          status.className = "admin-status is-error";
+        }
+      }
+
+      async function deleteAnnouncement() {
+        if (!state.active || !state.token) return;
+        try {
+          const response = await fetch(`/api/announcements?id=${encodeURIComponent(state.active.id)}`, {
+            method: "DELETE",
+            headers: { "X-Dashboard-Token": state.token }
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.success === false) {
+            throw new Error(data.message || "删除失败");
+          }
+          $("#detailDialog").close();
+          showToast("公告已删除");
+          await loadAnnouncements();
+        } catch (error) {
+          showToast(error.message || "删除失败");
+        }
+      }
+
+      function bind() {
+        if (["127.0.0.1", "localhost"].includes(location.hostname)) {
+          $$("[data-home-link]").forEach((link) => link.setAttribute("href", "index5.html"));
+        }
+        $("#themeButton").addEventListener("click", () => window.PellosyTheme?.cycle());
+        $("#noticeSearch").addEventListener("input", (event) => {
+          state.query = event.target.value;
+          renderList();
+        });
+        $("#detailClose").addEventListener("click", () => $("#detailDialog").close());
+        $("#detailDone").addEventListener("click", () => $("#detailDialog").close());
+        $("#detailDelete").addEventListener("click", deleteAnnouncement);
+        $("#detailDialog").addEventListener("click", (event) => {
+          if (event.target === $("#detailDialog")) $("#detailDialog").close();
+        });
+        $("#manageButton").addEventListener("click", () => {
+          $("#adminDialog").showModal();
+          const saved = (() => {
+            try {
+              return sessionStorage.getItem(TOKEN_KEY) || "";
+            } catch {
+              return "";
+            }
+          })();
+          if (saved) $("#adminPassword").value = saved;
+          window.setTimeout(() => $("#adminTitle").focus(), 50);
+        });
+        $("#adminClose").addEventListener("click", () => $("#adminDialog").close());
+        $("#adminCancel").addEventListener("click", () => $("#adminDialog").close());
+        $("#adminDialog").addEventListener("click", (event) => {
+          if (event.target === $("#adminDialog")) $("#adminDialog").close();
+        });
+        $("#adminForm").addEventListener("submit", publishAnnouncement);
+        bindScrollMotion();
+      }
+
+      function playOpeningAnimation() {
+        const curtain = $("#openingCurtain");
+        const counter = $("#openingCount");
+        if (!curtain || !counter) return;
+        document.body.classList.add("is-opening");
+        if (reducedMotion) {
+          curtain.remove();
+          document.body.classList.remove("is-opening");
+          return;
+        }
+        const start = performance.now();
+        const duration = 920;
+        const tick = (now) => {
+          const progress = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          counter.textContent = String(Math.round(eased * 100)).padStart(3, "0");
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            window.setTimeout(() => curtain.classList.add("is-leaving"), 190);
+          }
+        };
+        requestAnimationFrame(tick);
+        window.setTimeout(() => {
+          curtain.remove();
+          document.body.classList.remove("is-opening");
+        }, 1750);
+      }
+
+      async function init() {
+        try {
+          state.token = sessionStorage.getItem(TOKEN_KEY) || "";
+        } catch {}
+        playOpeningAnimation();
+        initializeHeadlineTyping();
+        bind();
+        await loadAnnouncements();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

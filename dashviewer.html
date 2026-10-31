@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="glass">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e8eef5">
+  <meta name="description" content="Lumonsky website access dashboard">
+  <script src="theme-sync.js"></script>
+  <title>访问监控 / Lumonsky</title>
+  <style>
+    :root {
+      --paper: #e8eef5;
+      --ink: #131923;
+      --muted: #6b7786;
+      --line: rgba(19, 25, 35, 0.14);
+      --accent: #f26f4a;
+      --accent-rgb: 242, 111, 74;
+      --blue: #3868ed;
+      --green: #3c7d51;
+      --red: #b7352d;
+      --orange: #d55b32;
+      --surface: rgba(255, 255, 255, 0.58);
+      --surface-strong: rgba(255, 255, 255, 0.78);
+      --track: rgba(19, 25, 35, 0.08);
+      --sans: "Google Sans Flex", "Helvetica Neue", Helvetica, Arial,
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      --serif: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --spring: cubic-bezier(0.2, 1.35, 0.35, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-width: 320px;
+      background: var(--paper);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(130deg, transparent 0 57%, rgba(var(--accent-rgb), 0.1) 57% 65%, transparent 65%),
+        var(--paper);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      transition: color 0.3s ease, background-color 0.3s ease;
+    }
+
+    body::before {
+      content: "LIVE";
+      position: fixed;
+      right: -1vw;
+      bottom: -8vh;
+      z-index: -1;
+      color: transparent;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(160px, 30vw, 500px);
+      font-weight: 900;
+      line-height: 0.8;
+      -webkit-text-stroke: 1px var(--line);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .scroll-progress {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 2000;
+      height: 2px;
+      background: color-mix(in srgb, var(--line) 55%, transparent);
+      pointer-events: none;
+    }
+
+    .scroll-progress i {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--accent);
+      box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 48%, transparent);
+      transform: scaleX(0);
+      transform-origin: left center;
+      will-change: transform;
+    }
+
+    button,
+    input,
+    select {
+      color: inherit;
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .icon-sm {
+      width: 13px;
+      height: 13px;
+    }
+
+    .svg-sprite {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .gate {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background:
+        linear-gradient(135deg, transparent 0 58%, rgba(var(--accent-rgb), 0.14) 58% 70%, transparent 70%),
+        var(--paper);
+    }
+
+    .gate-card {
+      width: min(430px, calc(100vw - 28px));
+      padding: 25px;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 28px 80px rgba(20, 30, 42, 0.16);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      animation: gateIn 0.68s var(--spring) both;
+    }
+
+    .gate-mark {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 18px;
+    }
+
+    .gate-index {
+      display: block;
+      margin-top: 17px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .gate h1 {
+      margin-top: 6px;
+      font-size: clamp(30px, 5vw, 46px);
+      font-weight: 750;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .gate p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.65;
+    }
+
+    .gate form {
+      display: grid;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .gate input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+      font-size: 11px;
+    }
+
+    .gate input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+    }
+
+    .gate button {
+      min-height: 40px;
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .gate-status {
+      min-height: 18px;
+      color: var(--red);
+      font-size: 8px;
+      line-height: 1.5;
+    }
+
+    .app {
+      width: min(100% - 34px, 1540px);
+      margin: 0 auto;
+      padding: 12px 0 30px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px;
+      background: color-mix(in srgb, var(--paper) 76%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(22px) saturate(150%);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
+      animation: headerIn 0.6s var(--ease) both;
+      transition: box-shadow 0.28s ease, background 0.28s ease;
+    }
+
+    .topbar.is-scrolled {
+      box-shadow: 0 12px 35px rgba(20, 30, 42, 0.1);
+    }
+
+    .brand {
+      display: inline-flex;
+      min-width: 0;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: var(--serif);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .brand-copy {
+      display: grid;
+      min-width: 0;
+      gap: 1px;
+    }
+
+    .brand-copy strong {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .brand-copy span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .live-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 3px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      white-space: nowrap;
+    }
+
+    .live-state::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 16%, transparent);
+      animation: livePulse 1.8s ease-in-out infinite;
+    }
+
+    .live-state.is-loading::before {
+      background: var(--orange);
+    }
+
+    .live-state.is-error::before {
+      background: var(--red);
+    }
+
+    .header-controls {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+    }
+
+    .range-switch {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    .range-switch button {
+      min-height: 28px;
+      padding: 0 10px;
+      color: var(--muted);
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 650;
+    }
+
+    .range-switch button[aria-selected="true"] {
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+    }
+
+    .tool {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      transition: color 0.18s ease, background 0.18s ease, transform 0.24s var(--spring);
+    }
+
+    .tool:hover {
+      color: var(--ink);
+      background: var(--surface);
+      transform: translateY(-1px);
+    }
+
+    .tool.is-spinning .icon {
+      animation: spin 0.7s linear infinite;
+    }
+
+    .tool.is-active {
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .tool-label {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 8px;
+    }
+
+    .intro {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      padding: clamp(40px, 7vw, 86px) 0 25px;
+    }
+
+    .intro-copy {
+      display: grid;
+      gap: 8px;
+    }
+
+    .intro-copy > span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .intro h1 {
+      max-width: 920px;
+      font-size: clamp(48px, 7.4vw, 112px);
+      font-weight: 850;
+      letter-spacing: 0;
+      line-height: 0.82;
+      text-transform: uppercase;
+      animation: titleIn 0.76s 0.08s var(--ease) both;
+    }
+
+    .type-line {
+      display: block;
+      width: max-content;
+      max-width: 100%;
+      min-height: 0.92em;
+      white-space: nowrap;
+    }
+
+    .typing-caret {
+      display: inline-block;
+      width: 0.055em;
+      height: 0.72em;
+      margin-left: 0.045em;
+      background: currentColor;
+      opacity: 0;
+      vertical-align: 0.02em;
+    }
+
+    .type-line.is-active .typing-caret {
+      opacity: 1;
+      animation: caretBlink 0.72s steps(1) infinite;
+    }
+
+    .intro h1 em {
+      color: var(--accent);
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .intro-meta {
+      display: grid;
+      min-width: 210px;
+      gap: 4px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+      line-height: 1.6;
+      text-align: right;
+    }
+
+    .intro-meta strong {
+      color: var(--ink);
+      font-size: 10px;
+      font-weight: 550;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric-card,
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      backdrop-filter: blur(24px) saturate(145%);
+      -webkit-backdrop-filter: blur(24px) saturate(145%);
+      box-shadow: 0 16px 48px rgba(24, 38, 52, 0.07);
+    }
+
+    .metric-card {
+      position: relative;
+      display: grid;
+      min-height: 118px;
+      align-content: space-between;
+      padding: 15px;
+      overflow: hidden;
+      transition:
+        transform 0.3s var(--spring),
+        border-color 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+      transform-style: preserve-3d;
+      --spot-x: 50%;
+      --spot-y: 50%;
+      --rx: 0deg;
+      --ry: 0deg;
+    }
+
+    .metric-card.is-entering {
+      animation: cardRise 0.62s var(--spring) backwards;
+      animation-delay: calc(var(--index, 0) * 45ms);
+    }
+
+    .metric-card:hover {
+      transform:
+        perspective(900px)
+        translateY(-3px)
+        rotateX(var(--rx))
+        rotateY(var(--ry));
+      border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+      box-shadow: 0 20px 55px rgba(24, 38, 52, 0.1);
+    }
+
+    .metric-card::before,
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: radial-gradient(
+        circle 150px at var(--spot-x, 50%) var(--spot-y, 50%),
+        color-mix(in srgb, var(--accent) 18%, transparent),
+        transparent 72%
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s ease;
+    }
+
+    .metric-card:hover::before,
+    .panel:hover::before {
+      opacity: 1;
+    }
+
+    .metric-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-card::after {
+      content: "";
+      position: absolute;
+      right: -23px;
+      bottom: -32px;
+      width: 78px;
+      height: 78px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+
+    .metric-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 8px;
+    }
+
+    .metric-label .icon {
+      width: 13px;
+      height: 13px;
+    }
+
+    .metric-value {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      font-family: "Arial Black", Arial, sans-serif;
+      font-size: clamp(28px, 3.2vw, 48px);
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 0.9;
+    }
+
+    .metric-value small {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      font-weight: 500;
+    }
+
+    .odometer {
+      display: inline-flex;
+      align-items: flex-end;
+      overflow: hidden;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .odometer-digit,
+    .odometer-separator {
+      display: inline-block;
+      height: 1em;
+      line-height: 1;
+    }
+
+    .odometer-digit {
+      width: 0.66em;
+      overflow: hidden;
+    }
+
+    .odometer-strip {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.82s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+
+    .odometer-strip span {
+      display: block;
+      height: 1em;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .odometer-separator {
+      width: 0.3em;
+      text-align: center;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 7px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .panel {
+      position: relative;
+      min-width: 0;
+      padding: 16px;
+      animation: cardRise 0.66s var(--ease) backwards;
+      transition:
+        transform 0.32s var(--ease),
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      --spot-x: 50%;
+      --spot-y: 50%;
+      --rx: 0deg;
+      --ry: 0deg;
+    }
+
+    .panel:hover {
+      transform:
+        perspective(1100px)
+        translateY(-2px)
+        rotateX(var(--rx))
+        rotateY(var(--ry));
+      border-color: color-mix(in srgb, var(--accent) 32%, var(--line));
+      box-shadow: 0 20px 56px rgba(24, 38, 52, 0.09);
+    }
+
+    .panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .reveal-pending {
+      opacity: 0;
+      transform: translateY(18px) scale(0.985);
+    }
+
+    .reveal-ready {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity 0.62s var(--ease),
+        transform 0.68s var(--spring),
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .span-8 { grid-column: span 8; }
+    .span-7 { grid-column: span 7; }
+    .span-6 { grid-column: span 6; }
+    .span-5 { grid-column: span 5; }
+    .span-4 { grid-column: span 4; }
+    .span-12 { grid-column: span 12; }
+
+    .panel-head {
+      display: flex;
+      min-width: 0;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      display: grid;
+      gap: 3px;
+    }
+
+    .panel-title span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      letter-spacing: 0.07em;
+    }
+
+    .panel-title h2 {
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .panel-meta {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      white-space: nowrap;
+    }
+
+    .trend-wrap {
+      position: relative;
+      height: 270px;
+    }
+
+    #trendCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.28s ease;
+    }
+
+    #trendCanvas.is-drawing {
+      animation: chartReveal 0.82s var(--ease) both;
+      transform-origin: bottom;
+    }
+
+    .chart-empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 5px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 8px;
+    }
+
+    .chart-empty strong {
+      color: var(--ink);
+      font-size: 10px;
+    }
+
+    .rank-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 5px 10px;
+      align-items: center;
+    }
+
+    .rank-copy {
+      display: grid;
+      min-width: 0;
+      gap: 1px;
+    }
+
+    .rank-copy strong {
+      overflow: hidden;
+      font-size: 9px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank-copy span {
+      overflow: hidden;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rank-count {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .bar-track {
+      grid-column: 1 / -1;
+      height: 3px;
+      overflow: hidden;
+      background: var(--track);
+      border-radius: 99px;
+    }
+
+    .bar-fill {
+      width: var(--bar, 0%);
+      height: 100%;
+      background: var(--accent);
+      border-radius: inherit;
+      transform-origin: left;
+      animation: barIn 0.7s var(--ease) both;
+    }
+
+    .environment-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .environment-block h3,
+    .mini-title {
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .live-feed {
+      display: grid;
+      max-height: 276px;
+      gap: 1px;
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line) transparent;
+    }
+
+    .feed-row {
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      padding: 9px 2px;
+      border-bottom: 1px solid var(--line);
+      animation: feedIn 0.35s var(--ease) both;
+    }
+
+    .feed-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: livePulse 1.9s ease-in-out infinite;
+    }
+
+    .feed-copy {
+      display: grid;
+      min-width: 0;
+      gap: 1px;
+    }
+
+    .feed-copy strong,
+    .feed-copy span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .feed-copy strong {
+      font-size: 8px;
+      font-weight: 600;
+    }
+
+    .feed-copy span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .feed-row time {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      white-space: nowrap;
+    }
+
+    .hour-heatmap {
+      display: grid;
+      grid-template-columns: repeat(24, minmax(0, 1fr));
+      gap: 3px;
+      margin-top: 4px;
+    }
+
+    .heat-cell {
+      position: relative;
+      aspect-ratio: 1 / 2.1;
+      min-width: 0;
+      background: color-mix(in srgb, var(--accent) var(--heat, 0%), var(--track));
+      border: 1px solid var(--line);
+      border-radius: 3px;
+    }
+
+    .heat-cell span {
+      position: absolute;
+      left: 50%;
+      bottom: -17px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 6px;
+      transform: translateX(-50%);
+    }
+
+    .heat-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 6px;
+    }
+
+    .table-wrap {
+      min-width: 0;
+      overflow: auto;
+      border-top: 1px solid var(--line);
+    }
+
+    .visits-table {
+      width: 100%;
+      min-width: 1080px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .visits-table th,
+    .visits-table td {
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .visits-table th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      color: var(--muted);
+      background: var(--paper);
+      font-family: var(--mono);
+      font-size: 7px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    .visits-table td {
+      color: var(--text-soft, var(--ink));
+      font-size: 8px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .visits-table tbody tr {
+      cursor: pointer;
+      transition: background 0.16s ease;
+      animation: rowIn 0.35s var(--ease) backwards;
+    }
+
+    .visits-table tbody tr:hover {
+      background: color-mix(in srgb, var(--accent) 7%, transparent);
+    }
+
+    .visits-table th:nth-child(1) { width: 122px; }
+    .visits-table th:nth-child(2) { width: 170px; }
+    .visits-table th:nth-child(3) { width: 175px; }
+    .visits-table th:nth-child(4) { width: 110px; }
+    .visits-table th:nth-child(5) { width: 150px; }
+    .visits-table th:nth-child(6) { width: 125px; }
+    .visits-table th:nth-child(7) { width: 230px; }
+
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .table-search {
+      width: min(210px, 40vw);
+      height: 29px;
+      padding: 0 9px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      outline: none;
+      font-size: 8px;
+    }
+
+    .table-search:focus {
+      border-color: var(--accent);
+    }
+
+    .empty-state {
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 6px;
+      min-height: 150px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 8px;
+      line-height: 1.6;
+    }
+
+    .empty-state strong {
+      color: var(--ink);
+      font-size: 11px;
+    }
+
+    .site-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 18px;
+      padding: 15px 2px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    dialog {
+      width: min(620px, calc(100vw - 24px));
+      max-height: calc(100vh - 30px);
+      margin: auto;
+      padding: 0;
+      color: var(--ink);
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.3);
+    }
+
+    dialog::backdrop {
+      background: rgba(12, 18, 25, 0.42);
+      backdrop-filter: blur(5px);
+    }
+
+    dialog[open] {
+      animation: dialogIn 0.32s var(--spring) both;
+    }
+
+    .detail-inner {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .detail-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-head span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .detail-head h2 {
+      margin-top: 5px;
+      font-size: 22px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .detail-item {
+      min-width: 0;
+      padding: 9px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+    }
+
+    .detail-item span {
+      display: block;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .detail-item strong {
+      display: block;
+      margin-top: 4px;
+      overflow-wrap: anywhere;
+      font-family: var(--mono);
+      font-size: 8px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 3500;
+      max-width: min(340px, calc(100vw - 24px));
+      padding: 10px 12px;
+      color: var(--accent-ink, #fff);
+      background: var(--accent);
+      border-radius: 6px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+      font-size: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.28s var(--spring);
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes headerIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes caretBlink {
+      0%, 48% { opacity: 1; }
+      49%, 100% { opacity: 0; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes chartReveal {
+      from {
+        opacity: 0;
+        clip-path: inset(0 100% 0 0);
+        transform: scaleY(0.88);
+      }
+      to {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes titleIn {
+      from { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateY(15px); }
+      to { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0); }
+    }
+
+    @keyframes gateIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes cardRise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes feedIn {
+      from { opacity: 0; transform: translateX(-5px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes barIn {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes dialogIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes livePulse {
+      0%, 100% { opacity: 0.38; transform: scale(0.82); }
+      50% { opacity: 1; transform: scale(1.12); }
+    }
+
+    @media (max-width: 1160px) {
+      .metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .span-8,
+      .span-7,
+      .span-6,
+      .span-5,
+      .span-4 {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        width: calc(100% - 20px);
+      }
+
+      .topbar {
+        flex-wrap: wrap;
+        padding: 8px 4px;
+      }
+
+      .brand-copy span,
+      .live-state {
+        display: none;
+      }
+
+      .header-controls {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .range-switch {
+        flex: 1;
+      }
+
+      .range-switch button {
+        flex: 1;
+        padding: 0 7px;
+      }
+
+      .tool-label {
+        display: none;
+      }
+
+      .intro {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 17px;
+        padding-top: 46px;
+      }
+
+      .intro h1 {
+        font-size: clamp(46px, 15vw, 76px);
+      }
+
+      .intro-meta {
+        min-width: 0;
+        text-align: left;
+      }
+
+      .metric-grid,
+      .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .span-8,
+      .span-7,
+      .span-6,
+      .span-5,
+      .span-4,
+      .span-12 {
+        grid-column: span 2;
+      }
+
+      .metric-card {
+        min-height: 104px;
+      }
+
+      .trend-wrap {
+        height: 225px;
+      }
+
+      .environment-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .panel-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .table-controls {
+        width: 100%;
+      }
+
+      .table-search {
+        width: 100%;
+      }
+
+      .detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress" aria-hidden="true"><i id="scrollProgress"></i></div>
+  <svg class="svg-sprite" aria-hidden="true">
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></symbol>
+    <symbol id="i-page" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 8a7 7 0 0 1 11.6-1L20 12M4 12l2.3 5a7 7 0 0 0 11.6-1"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </svg>
+
+  <section class="gate" id="gate">
+    <div class="gate-card">
+      <span class="gate-mark">DV</span>
+      <span class="gate-index">LUMONSKY / ACCESS OBSERVATORY</span>
+      <h1>访问监控</h1>
+      <p>请输入 Cloudflare 中配置的 DASHBOARD_PASSWORD。口令只保存在当前浏览器会话。</p>
+      <form id="gateForm">
+        <input id="gatePassword" type="password" maxlength="256" autocomplete="current-password" placeholder="访问口令" required>
+        <button type="submit">进入监控台 ↗</button>
+        <p class="gate-status" id="gateStatus" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <div class="app" id="app" hidden>
+    <header class="topbar">
+      <a class="brand" href="index.html" data-home-link aria-label="返回 Lumonsky 控制台">
+        <span class="brand-mark">DV</span>
+        <span class="brand-copy">
+          <strong>ACCESS / LIVE</strong>
+          <span>LUMONSKY VISIT OBSERVATORY</span>
+        </span>
+      </a>
+      <span class="live-state" id="liveState">正在连接</span>
+      <div class="header-controls">
+        <div class="range-switch" id="rangeSwitch" role="tablist" aria-label="时间范围">
+          <button type="button" data-range="24h" role="tab" aria-selected="false">24 小时</button>
+          <button type="button" data-range="7d" role="tab" aria-selected="true">7 天</button>
+          <button type="button" data-range="30d" role="tab" aria-selected="false">30 天</button>
+          <button type="button" data-range="all" role="tab" aria-selected="false">全部</button>
+        </div>
+        <button class="tool" id="refreshButton" type="button" aria-label="刷新数据">
+          <svg class="icon"><use href="#i-refresh"></use></svg>
+        </button>
+        <button class="tool" id="autoRefreshButton" type="button" aria-label="自动刷新" aria-pressed="true">
+          <svg class="icon"><use href="#i-pulse"></use></svg>
+        </button>
+        <button class="tool" id="themeButton" type="button" aria-label="切换主题">
+          <svg class="icon"><use href="#i-sun"></use></svg>
+        </button>
+        <button class="tool" id="exportButton" type="button" aria-label="导出 CSV">
+          <svg class="icon"><use href="#i-download"></use></svg>
+        </button>
+        <button class="tool" id="lockButton" type="button" aria-label="锁定监控台">
+          <svg class="icon"><use href="#i-lock"></use></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="intro-copy">
+          <span>WEBSITE TRAFFIC / PRIVATE ANALYTICS</span>
+          <h1 aria-label="看清访问。再行动。">
+            <span class="type-line" aria-hidden="true">
+              <span id="dashTypeOne">看清访问。</span><i class="typing-caret" aria-hidden="true"></i>
+            </span>
+            <span class="type-line" aria-hidden="true">
+              <em id="dashTypeTwo">再行动。</em><i class="typing-caret" aria-hidden="true"></i>
+            </span>
+          </h1>
+        </div>
+        <div class="intro-meta">
+          <span>最新更新</span>
+          <strong id="updatedAt">等待读取</strong>
+          <span id="rangeLabel">最近 7 天</span>
+        </div>
+      </section>
+
+      <section class="metric-grid" aria-label="访问核心指标">
+        <article class="metric-card" style="--index:0">
+          <span class="metric-label">访问量 <svg class="icon"><use href="#i-eye"></use></svg></span>
+          <strong class="metric-value" data-metric="visits">0</strong>
+          <span class="metric-note">所选时间范围</span>
+        </article>
+        <article class="metric-card" style="--index:1">
+          <span class="metric-label">独立访客 <svg class="icon"><use href="#i-users"></use></svg></span>
+          <strong class="metric-value" data-metric="visitors">0</strong>
+          <span class="metric-note">指纹 / 设备 ID 去重</span>
+        </article>
+        <article class="metric-card" style="--index:2">
+          <span class="metric-label">独立 IP <svg class="icon"><use href="#i-globe"></use></svg></span>
+          <strong class="metric-value" data-metric="uniqueIps">0</strong>
+          <span class="metric-note">网络来源数量</span>
+        </article>
+        <article class="metric-card" style="--index:3">
+          <span class="metric-label">今日访问 <svg class="icon"><use href="#i-clock"></use></svg></span>
+          <strong class="metric-value" data-metric="visitsToday">0</strong>
+          <span class="metric-note">自然日累计</span>
+        </article>
+        <article class="metric-card" style="--index:4">
+          <span class="metric-label">最近一小时 <svg class="icon"><use href="#i-pulse"></use></svg></span>
+          <strong class="metric-value" data-metric="visitsLastHour">0</strong>
+          <span class="metric-note">实时活跃强度</span>
+        </article>
+        <article class="metric-card" style="--index:5">
+          <span class="metric-label">页面数量 <svg class="icon"><use href="#i-page"></use></svg></span>
+          <strong class="metric-value" data-metric="uniquePages">0</strong>
+          <span class="metric-note" id="averageNote">0 次 / 访客</span>
+        </article>
+      </section>
+
+      <div class="dashboard-grid">
+        <section class="panel span-8">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>VISITS / TIME</span>
+              <h2>访问趋势</h2>
+            </div>
+            <span class="panel-meta" id="trendMeta">0 个时间点</span>
+          </div>
+          <div class="trend-wrap">
+            <canvas id="trendCanvas" aria-label="访问趋势图"></canvas>
+            <div class="chart-empty" id="chartEmpty">
+              <strong>暂无访问数据</strong>
+              <span>新访问会在用户打开页面时自动记录</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel span-4">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>REALTIME / STREAM</span>
+              <h2>最近访问</h2>
+            </div>
+            <span class="panel-meta" id="liveCount">0 events</span>
+          </div>
+          <div class="live-feed" id="liveFeed"></div>
+        </section>
+
+        <section class="panel span-4">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>CONTENT / RANK</span>
+              <h2>页面排行</h2>
+            </div>
+          </div>
+          <div class="rank-list" id="pageRank"></div>
+        </section>
+
+        <section class="panel span-4">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>ENVIRONMENT / MIX</span>
+              <h2>设备与浏览器</h2>
+            </div>
+          </div>
+          <div class="environment-grid" id="environmentGrid"></div>
+        </section>
+
+        <section class="panel span-4">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>GEOGRAPHY / SOURCE</span>
+              <h2>地区分布</h2>
+            </div>
+          </div>
+          <div class="rank-list" id="locationRank"></div>
+        </section>
+
+        <section class="panel span-5">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>REFERRER / SOURCE</span>
+              <h2>访问来源</h2>
+            </div>
+          </div>
+          <div class="rank-list" id="referrerRank"></div>
+        </section>
+
+        <section class="panel span-7">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>HOURLY / ACTIVITY</span>
+              <h2>24 小时活跃分布</h2>
+            </div>
+            <span class="panel-meta">UTC+8 本地时间</span>
+          </div>
+          <div class="hour-heatmap" id="hourHeatmap"></div>
+          <div class="heat-labels"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+        </section>
+
+        <section class="panel span-12">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span>RAW / DETAIL</span>
+              <h2>访问明细</h2>
+            </div>
+            <div class="table-controls">
+              <input class="table-search" id="tableSearch" type="search" placeholder="搜索页面、IP、地区、浏览器">
+              <span class="panel-meta" id="tableMeta">0 rows</span>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="visits-table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>页面</th>
+                  <th>地区 / IP</th>
+                  <th>设备</th>
+                  <th>浏览器 / 系统</th>
+                  <th>网络</th>
+                  <th>来源</th>
+                </tr>
+              </thead>
+              <tbody id="visitsBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span>LUMONSKY / ACCESS OBSERVATORY / 2026</span>
+      <span>数据来自 D1 site_visits · 最多展示最近 500 条明细</span>
+    </footer>
+  </div>
+
+  <dialog id="detailDialog">
+    <div class="detail-inner">
+      <div class="detail-head">
+        <div>
+          <span>VISIT / DETAIL</span>
+          <h2>访问详情</h2>
+        </div>
+        <button class="tool" id="detailClose" type="button" aria-label="关闭">
+          <svg class="icon"><use href="#i-x"></use></svg>
+        </button>
+      </div>
+      <div class="detail-grid" id="detailGrid"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="cloud-api.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const $ = (selector, scope = document) => scope.querySelector(selector);
+      const $$ = (selector, scope = document) => [...scope.querySelectorAll(selector)];
+      const TOKEN_KEY = "lumon.dashviewer.token";
+      const AUTO_REFRESH_MS = 15000;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const state = {
+        token: "",
+        range: "7d",
+        data: null,
+        loading: false,
+        autoRefresh: true,
+        timer: 0,
+        toastTimer: 0,
+        query: ""
+      };
+
+      function initializeHeadlineTyping() {
+        const firstNode = $("#dashTypeOne");
+        const secondNode = $("#dashTypeTwo");
+        const firstLine = firstNode?.closest(".type-line");
+        const secondLine = secondNode?.closest(".type-line");
+        if (!firstNode || !secondNode || !firstLine || !secondLine) return;
+        const phrases = [
+          ["看清访问。", "再行动。"],
+          ["读懂流量。", "再判断。"],
+          ["每一秒。", "都有迹可循。"]
+        ];
+        if (reducedMotion) {
+          firstNode.textContent = phrases[0][0];
+          secondNode.textContent = phrases[0][1];
+          return;
+        }
+        const wait = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+        const setActive = (line) => {
+          firstLine.classList.toggle("is-active", line === firstLine);
+          secondLine.classList.toggle("is-active", line === secondLine);
+        };
+        const type = async (node, line, text) => {
+          setActive(line);
+          node.textContent = "";
+          for (const character of text) {
+            node.textContent += character;
+            await wait(48 + Math.random() * 54);
+          }
+        };
+        const erase = async (node, line) => {
+          setActive(line);
+          while (node.textContent.length) {
+            node.textContent = node.textContent.slice(0, -1);
+            await wait(27 + Math.random() * 34);
+          }
+        };
+        (async () => {
+          let index = 0;
+          await wait(880);
+          while (true) {
+            const [firstPhrase, secondPhrase] = phrases[index % phrases.length];
+            await type(firstNode, firstLine, firstPhrase);
+            await wait(130);
+            await type(secondNode, secondLine, secondPhrase);
+            await wait(1850);
+            await erase(secondNode, secondLine);
+            await wait(150);
+            await erase(firstNode, firstLine);
+            firstLine.classList.remove("is-active");
+            secondLine.classList.remove("is-active");
+            await wait(360);
+            index += 1;
+          }
+        })();
+      }
+
+      function showToast(message) {
+        const node = $("#toast");
+        node.textContent = message;
+        node.classList.add("is-visible");
+        clearTimeout(state.toastTimer);
+        state.toastTimer = setTimeout(() => node.classList.remove("is-visible"), 2400);
+      }
+
+      function parseDate(row) {
+        let value = String(row?.visit_time || "");
+        if (!value) return null;
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)) value = `${value.replace(" ", "T")}Z`;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      function formatTime(value) {
+        const date = value instanceof Date ? value : parseDate(value);
+        if (!date) return "—";
+        return date.toLocaleString("zh-CN", {
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false
+        });
+      }
+
+      function timeAgo(value) {
+        const date = value instanceof Date ? value : parseDate(value);
+        if (!date) return "未知";
+        const diff = Date.now() - date.getTime();
+        if (diff < 60000) return "刚刚";
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
+        return `${Math.floor(diff / 86400000)} 天前`;
+      }
+
+      function formatNumber(value) {
+        return new Intl.NumberFormat("zh-CN").format(Number(value || 0));
+      }
+
+      function animateNumber(node, value) {
+        const target = Number(value || 0);
+        const formatted = formatNumber(target);
+        node.dataset.value = String(target);
+        node.setAttribute("aria-label", formatted);
+        if (reducedMotion) {
+          node.textContent = formatted;
+          return;
+        }
+        node.classList.add("odometer");
+        node.replaceChildren();
+        [...formatted].forEach((character, index) => {
+          if (!/\d/.test(character)) {
+            const separator = document.createElement("span");
+            separator.className = "odometer-separator";
+            separator.textContent = character;
+            separator.setAttribute("aria-hidden", "true");
+            node.appendChild(separator);
+            return;
+          }
+          const digit = document.createElement("span");
+          digit.className = "odometer-digit";
+          digit.setAttribute("aria-hidden", "true");
+          const strip = document.createElement("span");
+          strip.className = "odometer-strip";
+          for (let number = 0; number <= 9; number += 1) {
+            const cell = document.createElement("span");
+            cell.textContent = String(number);
+            strip.appendChild(cell);
+          }
+          digit.appendChild(strip);
+          node.appendChild(digit);
+          requestAnimationFrame(() => {
+            strip.style.transitionDelay = `${index * 30}ms`;
+            strip.style.transform = `translateY(-${Number(character)}em)`;
+          });
+        });
+      }
+
+      function setLiveState(text, kind = "") {
+        const node = $("#liveState");
+        node.textContent = text;
+        node.classList.toggle("is-loading", kind === "loading");
+        node.classList.toggle("is-error", kind === "error");
+      }
+
+      function lock(message = "") {
+        clearInterval(state.timer);
+        state.token = "";
+        state.data = null;
+        try {
+          sessionStorage.removeItem(TOKEN_KEY);
+        } catch {}
+        $("#app").hidden = true;
+        $("#gate").hidden = false;
+        $("#gatePassword").value = "";
+        $("#gateStatus").textContent = message;
+        window.setTimeout(() => $("#gatePassword").focus(), 40);
+      }
+
+      function normalize(payload) {
+        return {
+          generatedAt: payload.generatedAt || new Date().toISOString(),
+          range: payload.range || state.range,
+          summary: payload.summary || {},
+          series: Array.isArray(payload.series) ? payload.series : [],
+          hourly: Array.isArray(payload.hourly) ? payload.hourly : [],
+          groups: payload.groups || {},
+          recent: Array.isArray(payload.recent) ? payload.recent : [],
+          columns: Array.isArray(payload.columns) ? payload.columns : [],
+          rangeApplied: Boolean(payload.rangeApplied)
+        };
+      }
+
+      async function loadData(silent = false) {
+        if (!state.token || state.loading) return;
+        state.loading = true;
+        $("#refreshButton").classList.add("is-spinning");
+        if (!silent) setLiveState("正在读取", "loading");
+        try {
+          const response = await fetch(`/api/dashviewer?range=${encodeURIComponent(state.range)}`, {
+            headers: { "X-Dashboard-Token": state.token },
+            cache: "no-store"
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || payload.success === false) {
+            if (response.status === 401) {
+              lock(payload.message || "口令已失效，请重新输入");
+              return;
+            }
+            throw new Error(payload.message || `HTTP ${response.status}`);
+          }
+          state.data = normalize(payload);
+          $("#gate").hidden = true;
+          $("#app").hidden = false;
+          renderAll();
+          if (!silent) showToast("访问数据已更新");
+        } catch (error) {
+          setLiveState("读取失败", "error");
+          if (!silent) showToast(`读取失败：${error.message || error}`);
+        } finally {
+          state.loading = false;
+          $("#refreshButton").classList.remove("is-spinning");
+        }
+      }
+
+      function renderMetrics() {
+        const summary = state.data.summary;
+        $$(".metric-card").forEach((card) => {
+          card.classList.remove("is-entering");
+          void card.offsetWidth;
+          card.classList.add("is-entering");
+        });
+        $$("[data-metric]").forEach((node) => {
+          animateNumber(node, summary[node.dataset.metric] || 0);
+        });
+        $("#averageNote").textContent = `${summary.averageVisitsPerVisitor || 0} 次 / 访客`;
+        $("#updatedAt").textContent = formatTime(state.data.generatedAt);
+        const labels = {
+          "24h": "最近 24 小时",
+          "7d": "最近 7 天",
+          "30d": "最近 30 天",
+          all: "全部记录"
+        };
+        $("#rangeLabel").textContent = labels[state.range] || "";
+        setLiveState(`已连接 · ${timeAgo(state.data.generatedAt)}`);
+      }
+
+      function renderRank(container, items, options = {}) {
+        container.replaceChildren();
+        if (!items?.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = "<strong>暂无数据</strong><span>还没有对应访问记录</span>";
+          container.appendChild(empty);
+          return;
+        }
+        const max = Math.max(...items.map((item) => item.count), 1);
+        items.slice(0, options.limit || 8).forEach((item, index) => {
+          const row = document.createElement("div");
+          row.className = "rank-row";
+          const label = options.format ? options.format(item.name, item) : item.name;
+          const detail = options.detail ? options.detail(item.name, item) : `${item.count} 次`;
+          row.innerHTML = `
+            <span class="rank-copy"><strong></strong><span></span></span>
+            <span class="rank-count">${formatNumber(item.count)}</span>
+            <span class="bar-track"><i class="bar-fill" style="--bar:${Math.max(3, item.count / max * 100)}%;animation-delay:${index * 35}ms"></i></span>
+          `;
+          $(".rank-copy strong", row).textContent = label;
+          $(".rank-copy span", row).textContent = detail;
+          container.appendChild(row);
+        });
+      }
+
+      function renderEnvironment() {
+        const container = $("#environmentGrid");
+        container.replaceChildren();
+        const groups = [
+          ["浏览器", state.data.groups.browser || []],
+          ["设备", state.data.groups.device || []],
+          ["平台", state.data.groups.platform || []],
+          ["屏幕", state.data.groups.screen || []]
+        ];
+        groups.forEach(([title, items]) => {
+          const block = document.createElement("div");
+          block.className = "environment-block";
+          block.innerHTML = `<h3>${title}</h3><div class="rank-list"></div>`;
+          renderRank($(".rank-list", block), items, { limit: 4 });
+          container.appendChild(block);
+        });
+      }
+
+      function renderLiveFeed() {
+        const feed = $("#liveFeed");
+        const items = state.data.recent.slice(0, 12);
+        feed.replaceChildren();
+        $("#liveCount").textContent = `${state.data.recent.length} events`;
+        if (!items.length) {
+          feed.innerHTML = '<div class="empty-state"><strong>等待访问</strong><span>打开网站页面后，这里会出现实时记录</span></div>';
+          return;
+        }
+        items.forEach((row, index) => {
+          const node = document.createElement("div");
+          node.className = "feed-row";
+          node.style.animationDelay = `${index * 24}ms`;
+          node.innerHTML = '<i class="feed-dot"></i><span class="feed-copy"><strong></strong><span></span></span><time></time>';
+          $(".feed-copy strong", node).textContent = row.page || "未知页面";
+          $(".feed-copy span", node).textContent = [row.location, row.browser, row.device].filter(Boolean).join(" · ") || "未知访问";
+          $("time", node).textContent = timeAgo(row);
+          node.title = `${row.ip || ""} ${row.platform || ""}`;
+          feed.appendChild(node);
+        });
+      }
+
+      function referrerLabel(value) {
+        if (!value) return "直接访问";
+        try {
+          return new URL(value).hostname;
+        } catch {
+          return value;
+        }
+      }
+
+      function renderDistributions() {
+        renderRank($("#pageRank"), state.data.groups.page || [], {
+          format: (name) => name || "未知页面",
+          detail: (name, item) => `${item.count} 次访问`
+        });
+        renderRank($("#locationRank"), state.data.groups.location || [], {
+          format: (name) => name || "未知地区"
+        });
+        renderRank($("#referrerRank"), state.data.groups.referrer || [], {
+          format: referrerLabel
+        });
+      }
+
+      function renderHeatmap() {
+        const counts = Array(24).fill(0);
+        const source = state.data.hourly.length
+          ? state.data.hourly
+          : state.data.recent.map((row) => ({ row }));
+        source.forEach((item) => {
+          const date = item.row ? parseDate(item.row) : new Date(String(item.bucket || "").replace(" ", "T"));
+          if (!date || Number.isNaN(date.getTime())) return;
+          counts[date.getHours()] += Number(item.count || 1);
+        });
+        const max = Math.max(...counts, 1);
+        const heatmap = $("#hourHeatmap");
+        heatmap.replaceChildren();
+        counts.forEach((count, hour) => {
+          const cell = document.createElement("span");
+          cell.className = "heat-cell";
+          cell.style.setProperty("--heat", `${Math.round(count / max * 88)}%`);
+          cell.title = `${String(hour).padStart(2, "0")}:00 · ${count} 次`;
+          if (hour % 3 === 0) {
+            const label = document.createElement("span");
+            label.textContent = String(hour).padStart(2, "0");
+            cell.appendChild(label);
+          }
+          heatmap.appendChild(cell);
+        });
+      }
+
+      function drawTrend() {
+        const canvas = $("#trendCanvas");
+        const context = canvas.getContext("2d");
+        const series = state.data.series;
+        const empty = $("#chartEmpty");
+        empty.hidden = series.length > 0;
+        canvas.classList.remove("is-drawing");
+        void canvas.offsetWidth;
+        if (!reducedMotion && series.length) canvas.classList.add("is-drawing");
+        const rect = canvas.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.round(rect.width * ratio));
+        canvas.height = Math.max(1, Math.round(rect.height * ratio));
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        context.clearRect(0, 0, rect.width, rect.height);
+        if (!series.length) return;
+        const styles = getComputedStyle(document.documentElement);
+        const accent = styles.getPropertyValue("--accent").trim();
+        const muted = styles.getPropertyValue("--muted").trim();
+        const line = styles.getPropertyValue("--line").trim();
+        const left = 35;
+        const right = 12;
+        const top = 14;
+        const bottom = 28;
+        const width = rect.width - left - right;
+        const height = rect.height - top - bottom;
+        const max = Math.max(...series.map((item) => Number(item.count || 0)), 1);
+        const points = series.map((item, index) => ({
+          x: left + (series.length === 1 ? width / 2 : index / (series.length - 1) * width),
+          y: top + height - Number(item.count || 0) / max * height
+        }));
+
+        context.font = "9px ui-monospace, monospace";
+        context.fillStyle = muted;
+        context.strokeStyle = line;
+        context.lineWidth = 1;
+        for (let index = 0; index <= 4; index += 1) {
+          const y = top + height / 4 * index;
+          context.beginPath();
+          context.moveTo(left, y);
+          context.lineTo(left + width, y);
+          context.stroke();
+          context.fillText(String(Math.round(max - max / 4 * index)), 2, y + 3);
+        }
+
+        const gradient = context.createLinearGradient(0, top, 0, top + height);
+        gradient.addColorStop(0, `${accent}55`);
+        gradient.addColorStop(1, `${accent}00`);
+        context.beginPath();
+        context.moveTo(points[0].x, top + height);
+        points.forEach((point) => context.lineTo(point.x, point.y));
+        context.lineTo(points[points.length - 1].x, top + height);
+        context.closePath();
+        context.fillStyle = gradient;
+        context.fill();
+
+        context.beginPath();
+        points.forEach((point, index) => {
+          if (index === 0) context.moveTo(point.x, point.y);
+          else context.lineTo(point.x, point.y);
+        });
+        context.strokeStyle = accent;
+        context.lineWidth = 2;
+        context.lineJoin = "round";
+        context.stroke();
+
+        points.forEach((point, index) => {
+          if (series.length > 24 && index % Math.ceil(series.length / 8) !== 0 && index !== series.length - 1) return;
+          context.beginPath();
+          context.arc(point.x, point.y, 2.5, 0, Math.PI * 2);
+          context.fillStyle = accent;
+          context.fill();
+        });
+
+        const labelIndexes = new Set([0, Math.floor((series.length - 1) / 2), series.length - 1]);
+        context.fillStyle = muted;
+        labelIndexes.forEach((index) => {
+          const label = String(series[index]?.bucket || "").slice(
+            state.range === "24h" ? 5 : 5
+          );
+          context.fillText(label, Math.max(left, points[index].x - 25), rect.height - 8);
+        });
+        $("#trendMeta").textContent = `${series.length} 个时间点 · 峰值 ${max}`;
+      }
+
+      function filteredRows() {
+        const query = state.query.trim().toLowerCase();
+        if (!query) return state.data.recent;
+        return state.data.recent.filter((row) => [
+          row.page,
+          row.ip,
+          row.location,
+          row.browser,
+          row.platform,
+          row.device,
+          row.network,
+          row.referrer,
+          row.model
+        ].join(" ").toLowerCase().includes(query));
+      }
+
+      function renderTable() {
+        const body = $("#visitsBody");
+        const rows = filteredRows();
+        body.replaceChildren();
+        $("#tableMeta").textContent = `${rows.length} rows`;
+        if (!rows.length) {
+          const row = document.createElement("tr");
+          row.innerHTML = '<td colspan="7"><div class="empty-state"><strong>暂无匹配记录</strong><span>调整搜索条件或时间范围</span></div></td>';
+          body.appendChild(row);
+          return;
+        }
+        rows.slice(0, 200).forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${escapeCell(formatTime(item))}</td>
+            <td>${escapeCell(item.page || "—")}</td>
+            <td>${escapeCell([item.location, item.ip].filter(Boolean).join("\n") || "—")}</td>
+            <td>${escapeCell(item.device || "—")}</td>
+            <td>${escapeCell([item.browser, item.platform].filter(Boolean).join("\n") || "—")}</td>
+            <td>${escapeCell([item.network, item.tz].filter(Boolean).join("\n") || "—")}</td>
+            <td>${escapeCell(referrerLabel(item.referrer))}</td>
+          `;
+          row.addEventListener("click", () => showDetail(item));
+          body.appendChild(row);
+        });
+      }
+
+      function escapeCell(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\n/g, "<br>");
+      }
+
+      function showDetail(row) {
+        const fields = [
+          ["访问时间", formatTime(row)],
+          ["页面", row.page],
+          ["IP", row.ip],
+          ["地区", row.location],
+          ["设备", row.device],
+          ["浏览器", row.browser],
+          ["平台", row.platform],
+          ["设备型号", row.model],
+          ["GPU", row.gpu],
+          ["屏幕", row.screen],
+          ["CPU 核心", row.cores],
+          ["设备内存", row.memory ? `${row.memory} GB` : ""],
+          ["网络", row.network],
+          ["时区", row.tz],
+          ["设备 ID", row.device_id],
+          ["指纹", row.fingerprint],
+          ["来源", row.referrer || "直接访问"]
+        ];
+        const grid = $("#detailGrid");
+        grid.replaceChildren();
+        fields.forEach(([label, value]) => {
+          const item = document.createElement("div");
+          item.className = "detail-item";
+          item.innerHTML = "<span></span><strong></strong>";
+          $("span", item).textContent = label;
+          $("strong", item).textContent = value || "—";
+          grid.appendChild(item);
+        });
+        $("#detailDialog").showModal();
+      }
+
+      function renderAll() {
+        renderMetrics();
+        renderDistributions();
+        renderEnvironment();
+        renderLiveFeed();
+        renderHeatmap();
+        renderTable();
+        requestAnimationFrame(drawTrend);
+      }
+
+      function exportCsv() {
+        const rows = filteredRows();
+        if (!rows.length) {
+          showToast("没有可导出的访问记录");
+          return;
+        }
+        const columns = [
+          "visit_time", "page", "ip", "location", "device", "browser", "platform",
+          "model", "gpu", "screen", "cores", "memory", "network", "tz",
+          "device_id", "fingerprint", "referrer"
+        ];
+        const escape = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+        const csv = [
+          columns.join(","),
+          ...rows.map((row) => columns.map((column) => escape(row[column])).join(","))
+        ].join("\r\n");
+        const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `lumonsky-visits-${state.range}-${new Date().toISOString().slice(0, 10)}.csv`;
+        anchor.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast(`已导出 ${rows.length} 条访问记录`);
+      }
+
+      function bindMotion() {
+        const progress = $("#scrollProgress");
+        const topbar = $(".topbar");
+        let scrollFrame = 0;
+        const updateScroll = () => {
+          scrollFrame = 0;
+          const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+          progress.style.transform = `scaleX(${Math.min(1, Math.max(0, scrollY / max))})`;
+          topbar.classList.toggle("is-scrolled", scrollY > 12);
+        };
+        addEventListener("scroll", () => {
+          if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScroll);
+        }, { passive: true });
+        updateScroll();
+
+        $$(".metric-card, .panel").forEach((card) => {
+          card.addEventListener("pointermove", (event) => {
+            if (reducedMotion || matchMedia("(pointer: coarse)").matches) return;
+            const rect = card.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            card.style.setProperty("--spot-x", `${x}px`);
+            card.style.setProperty("--spot-y", `${y}px`);
+            card.style.setProperty("--ry", `${((x / rect.width) - 0.5) * 2.2}deg`);
+            card.style.setProperty("--rx", `${(0.5 - y / rect.height) * 1.8}deg`);
+          });
+          card.addEventListener("pointerleave", () => {
+            card.style.setProperty("--rx", "0deg");
+            card.style.setProperty("--ry", "0deg");
+            card.style.setProperty("--spot-x", "50%");
+            card.style.setProperty("--spot-y", "50%");
+          });
+        });
+
+        if (reducedMotion || !("IntersectionObserver" in window)) return;
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.remove("reveal-pending");
+            entry.target.classList.add("reveal-ready");
+            observer.unobserve(entry.target);
+            setTimeout(() => {
+              entry.target.style.transitionDelay = "";
+            }, 900);
+          });
+        }, {
+          threshold: 0.08,
+          rootMargin: "0px 0px -5% 0px"
+        });
+        $$(".panel").forEach((panel, index) => {
+          panel.classList.add("reveal-pending");
+          panel.style.transitionDelay = `${Math.min(index * 45, 180)}ms`;
+          observer.observe(panel);
+        });
+      }
+
+      function startAutoRefresh() {
+        clearInterval(state.timer);
+        if (!state.autoRefresh) return;
+        state.timer = setInterval(() => {
+          if (!document.hidden && state.token) loadData(true);
+        }, AUTO_REFRESH_MS);
+      }
+
+      async function submitPassword(event) {
+        event.preventDefault();
+        const token = $("#gatePassword").value;
+        if (!token) return;
+        state.token = token;
+        $("#gateStatus").textContent = "正在验证口令…";
+        await loadData();
+        if (state.data) {
+          try {
+            sessionStorage.setItem(TOKEN_KEY, token);
+          } catch {}
+          $("#gateStatus").textContent = "";
+          startAutoRefresh();
+        } else {
+          state.token = "";
+          $("#gateStatus").textContent = "验证失败，请检查口令或后端配置";
+        }
+      }
+
+      function bind() {
+        if (["127.0.0.1", "localhost"].includes(location.hostname)) {
+          $("[data-home-link]").setAttribute("href", "index5.html");
+        }
+        $("#gateForm").addEventListener("submit", submitPassword);
+        $("#refreshButton").addEventListener("click", () => loadData());
+        $("#lockButton").addEventListener("click", () => lock("已锁定"));
+        $("#exportButton").addEventListener("click", exportCsv);
+        $("#themeButton").addEventListener("click", () => window.PellosyTheme?.cycle());
+        $("#autoRefreshButton").addEventListener("click", () => {
+          state.autoRefresh = !state.autoRefresh;
+          $("#autoRefreshButton").classList.toggle("is-active", state.autoRefresh);
+          $("#autoRefreshButton").setAttribute("aria-pressed", String(state.autoRefresh));
+          startAutoRefresh();
+          showToast(state.autoRefresh ? "自动刷新已开启" : "自动刷新已暂停");
+        });
+        $$("[data-range]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.range = button.dataset.range;
+            $$("[data-range]").forEach((item) => {
+              item.setAttribute("aria-selected", String(item === button));
+            });
+            loadData();
+          });
+        });
+        $("#tableSearch").addEventListener("input", (event) => {
+          state.query = event.target.value;
+          renderTable();
+        });
+        $("#detailClose").addEventListener("click", () => $("#detailDialog").close());
+        $("#detailDialog").addEventListener("click", (event) => {
+          if (event.target === $("#detailDialog")) $("#detailDialog").close();
+        });
+        window.addEventListener("pellosy:theme-change", () => {
+          if (state.data) requestAnimationFrame(drawTrend);
+        });
+        window.addEventListener("resize", () => {
+          if (state.data) requestAnimationFrame(drawTrend);
+        });
+      }
+
+      async function init() {
+        initializeHeadlineTyping();
+        bind();
+        bindMotion();
+        $("#autoRefreshButton").classList.add("is-active");
+        let saved = "";
+        try {
+          saved = sessionStorage.getItem(TOKEN_KEY) || "";
+        } catch {}
+        if (!saved) return;
+        state.token = saved;
+        await loadData(true);
+        if (state.data) startAutoRefresh();
+        else state.token = "";
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

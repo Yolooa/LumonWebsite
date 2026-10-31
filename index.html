@@ -3564,6 +3564,191 @@
       pointer-events: none;
     }
 
+    .dynamic-island {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      z-index: 310;
+      display: grid;
+      width: 176px;
+      height: 38px;
+      place-items: center;
+      overflow: hidden;
+      color: #f8fafc;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 45%),
+        #050505;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 999px;
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -18px) scale(0.82);
+      transform-origin: center top;
+      transition:
+        width 0.46s cubic-bezier(0.16, 1, 0.3, 1),
+        height 0.46s cubic-bezier(0.16, 1, 0.3, 1),
+        border-radius 0.46s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.24s ease,
+        transform 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+      will-change: width, height, transform;
+    }
+
+    .dynamic-island.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .dynamic-island.is-expanded {
+      width: min(430px, calc(100vw - 24px));
+      height: 72px;
+      border-radius: 26px;
+    }
+
+    .island-compact-view,
+    .island-expanded-view {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.2s ease, transform 0.34s var(--ease-spring);
+    }
+
+    .island-compact-view {
+      justify-content: space-between;
+      padding: 0 15px;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .dynamic-island.is-expanded .island-compact-view {
+      opacity: 0;
+      transform: scale(0.82);
+      pointer-events: none;
+    }
+
+    .island-expanded-view {
+      gap: 10px;
+      padding: 0 12px 0 15px;
+      opacity: 0;
+      transform: translateY(7px) scale(0.96);
+      pointer-events: none;
+    }
+
+    .dynamic-island.is-expanded .island-expanded-view {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .island-camera-dot {
+      width: 9px;
+      height: 9px;
+      background: #1f2933;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+    }
+
+    .island-compact-copy {
+      display: inline-flex;
+      min-width: 0;
+      flex: 1;
+      align-items: center;
+      gap: 7px;
+      margin-left: 9px;
+    }
+
+    .island-compact-copy strong {
+      overflow: hidden;
+      color: rgba(248, 250, 252, 0.86);
+      font-size: 8px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .island-wave {
+      display: flex;
+      height: 15px;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .island-wave i {
+      width: 2px;
+      height: 6px;
+      background: var(--lime);
+      border-radius: 99px;
+      animation: islandWave 0.9s ease-in-out infinite alternate;
+    }
+
+    .island-wave i:nth-child(2) {
+      height: 11px;
+      animation-delay: 0.18s;
+    }
+
+    .island-wave i:nth-child(3) {
+      height: 8px;
+      animation-delay: 0.34s;
+    }
+
+    .island-toast-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #101410;
+      background: var(--lime);
+      border-radius: 50%;
+    }
+
+    .island-toast-copy {
+      display: grid;
+      min-width: 0;
+      flex: 1;
+      gap: 2px;
+    }
+
+    .island-toast-copy strong,
+    .island-toast-copy span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .island-toast-copy strong {
+      color: #fff;
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .island-toast-copy span {
+      color: rgba(248, 250, 252, 0.62);
+      font-size: 8px;
+    }
+
+    .island-close {
+      display: grid;
+      width: 27px;
+      height: 27px;
+      place-items: center;
+      flex: 0 0 auto;
+      color: rgba(248, 250, 252, 0.64);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      transition: color 0.2s ease, background 0.2s ease, transform 0.24s var(--ease-spring);
+    }
+
+    .island-close:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.09);
+      transform: rotate(8deg);
+    }
+
     .toast {
       display: grid;
       grid-template-columns: 28px minmax(0, 1fr) 24px;
@@ -3969,6 +4154,11 @@
         opacity: 0;
         transform: translateY(8px) scale(0.97);
       }
+    }
+
+    @keyframes islandWave {
+      0% { height: 4px; opacity: 0.48; }
+      100% { height: 14px; opacity: 1; }
     }
 
     @keyframes ripple {
@@ -5244,6 +5434,619 @@
       }
     }
 
+    .header-fab {
+      position: relative;
+      z-index: 24;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .fab-master-trigger {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      width: auto;
+      min-width: 104px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+      flex: 0 0 auto;
+      color: var(--text);
+      background: color-mix(in srgb, var(--surface-raised) 84%, transparent);
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      box-shadow:
+        0 10px 28px rgba(18, 30, 43, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(22px) saturate(1.45);
+      -webkit-backdrop-filter: blur(22px) saturate(1.45);
+      transition:
+        transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+        color 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .fab-master-trigger:hover {
+      color: var(--text);
+      background: var(--surface-raised);
+      border-color: rgba(var(--accent-rgb), 0.45);
+      transform: translateY(-1px) scale(1.04);
+    }
+
+    .fab-cross-icon {
+      width: 14px;
+      height: 14px;
+      color: var(--accent);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .fab-trigger-label {
+      font-size: 8px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .header-fab.is-expanded .fab-master-trigger {
+      color: var(--text);
+      background: var(--surface-raised);
+      border-color: var(--accent);
+      box-shadow:
+        0 12px 32px rgba(18, 30, 43, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .header-fab.is-expanded .fab-cross-icon {
+      transform: rotate(45deg);
+    }
+
+    .fab-menu-items {
+      position: absolute;
+      top: 50%;
+      right: 111px;
+      z-index: 1;
+      display: flex;
+      max-width: calc(100vw - 72px);
+      align-items: stretch;
+      gap: 2px;
+      padding: 5px;
+      overflow-x: auto;
+      color: var(--text);
+      background: var(--surface-raised);
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(28px) saturate(1.5);
+      -webkit-backdrop-filter: blur(28px) saturate(1.5);
+      opacity: 0;
+      pointer-events: none;
+      scrollbar-width: none;
+      transform: translate(8px, -50%) scale(0.72);
+      transform-origin: right center;
+      transition:
+        opacity 0.22s ease,
+        transform 0.44s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fab-menu-items::-webkit-scrollbar {
+      display: none;
+    }
+
+    .header-fab.is-expanded .fab-menu-items {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(0, -50%) scale(1);
+    }
+
+    .fab-action-item {
+      display: grid;
+      width: 46px;
+      min-width: 46px;
+      min-height: 49px;
+      place-items: center;
+      gap: 2px;
+      padding: 5px 3px;
+      color: var(--text-soft);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      text-align: center;
+      opacity: 0;
+      transform: translateX(12px) scale(0.82);
+      transition:
+        opacity 0.2s ease,
+        transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+        color 0.18s ease,
+        background 0.18s ease,
+        border-color 0.18s ease;
+    }
+
+    .header-fab.is-expanded .fab-action-item {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+
+    .header-fab.is-expanded .fab-action-item:nth-child(1) { transition-delay: 0.03s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(2) { transition-delay: 0.055s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(3) { transition-delay: 0.08s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(4) { transition-delay: 0.105s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(5) { transition-delay: 0.13s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(6) { transition-delay: 0.155s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(7) { transition-delay: 0.18s; }
+
+    .fab-action-item:hover,
+    .fab-action-item:focus-visible,
+    .fab-action-item[aria-expanded="true"] {
+      color: var(--text);
+      background: rgba(var(--accent-rgb), 0.13);
+      border-color: var(--line);
+      transform: translateY(-2px);
+    }
+
+    .f-icon {
+      position: relative;
+      display: grid;
+      width: 25px;
+      height: 25px;
+      place-items: center;
+    }
+
+    .f-icon .icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .f-lbl {
+      display: block;
+      max-width: 48px;
+      overflow: hidden;
+      font-size: 7px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .f-icon-notice {
+      overflow: visible;
+    }
+
+    .f-icon-notice .notice-dot {
+      top: -2px;
+      right: -2px;
+    }
+
+    .fab-action-item .theme-swatch {
+      width: 15px;
+      height: 15px;
+    }
+
+    @media (max-width: 760px) {
+      .fab-master-trigger {
+        min-width: 91px;
+        height: 35px;
+        padding: 0 10px;
+        gap: 5px;
+      }
+
+      .fab-trigger-label {
+        font-size: 7px;
+      }
+
+      .fab-menu-items {
+        top: calc(100% + 9px);
+        right: 0;
+        max-width: calc(100vw - 20px);
+        transform: translateY(-7px) scale(0.88);
+        transform-origin: right top;
+      }
+
+      .header-fab.is-expanded .fab-menu-items {
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .page {
+      padding-bottom: 120px;
+    }
+
+    .mac-dock-shell {
+      position: fixed;
+      left: 50%;
+      bottom: 13px;
+      z-index: 280;
+      max-width: calc(100vw - 20px);
+      transform: translateX(-50%);
+    }
+
+    .mac-dock {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 7px 11px 8px;
+      background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
+      border: 1px solid var(--line-strong);
+      border-radius: 19px;
+      box-shadow:
+        0 20px 55px rgba(24, 38, 52, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(30px) saturate(1.55);
+      -webkit-backdrop-filter: blur(30px) saturate(1.55);
+    }
+
+    .dock-app-item {
+      position: relative;
+      display: grid;
+      width: 45px;
+      height: 45px;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #fff;
+      background: var(--dock-color, #252a2f);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 12px;
+      box-shadow:
+        0 6px 16px rgba(20, 30, 42, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      transform: translateY(var(--dock-lift, 0)) scale(var(--dock-scale, 1));
+      transform-origin: center bottom;
+      transition:
+        transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.18s ease;
+      will-change: transform;
+    }
+
+    .dock-app-item:hover {
+      z-index: 3;
+      box-shadow:
+        0 12px 26px rgba(20, 30, 42, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    }
+
+    .dock-app-item[data-app="home"] {
+      --dock-color: #e7e8e2;
+      color: #161815;
+    }
+
+    .dock-app-item[data-app="personal"] {
+      --dock-color: #3868ed;
+    }
+
+    .dock-app-item[data-app="messages"] {
+      --dock-color: #20231f;
+    }
+
+    .dock-app-item[data-app="ide"] {
+      --dock-color: #d75e37;
+    }
+
+    .dock-app-item[data-app="dashboard"] {
+      --dock-color: #4e7f3a;
+    }
+
+    .dock-app-item[data-app="announcement"] {
+      --dock-color: #d75e37;
+    }
+
+    .dock-app-item[data-app="command"] {
+      --dock-color: #39424d;
+    }
+
+    .dock-app-item[data-app="notice"] {
+      --dock-color: #b64035;
+    }
+
+    .dock-app-item[data-app="docker"] {
+      --dock-color: #2388d9;
+    }
+
+    .dock-app-item[data-app="theme"] {
+      --dock-color: linear-gradient(145deg, #f26f4a, #e5ff00 48%, #3868ed);
+    }
+
+    .dock-app-item .icon {
+      width: 21px;
+      height: 21px;
+      pointer-events: none;
+    }
+
+    .dock-app-item.is-bouncing {
+      animation: dockBounce 0.72s cubic-bezier(0.28, 0.84, 0.42, 1);
+    }
+
+    .dock-app-dot {
+      position: absolute;
+      left: 50%;
+      bottom: -8px;
+      width: 4px;
+      height: 4px;
+      background: var(--text-soft);
+      border-radius: 50%;
+      opacity: 0;
+      transform: translateX(-50%);
+      transition: opacity 0.2s ease;
+    }
+
+    .dock-app-item.is-running .dock-app-dot {
+      opacity: 1;
+    }
+
+    .dock-tooltip {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      padding: 5px 8px;
+      color: var(--text);
+      background: var(--surface-raised);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      font-size: 7px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 5px) scale(0.94);
+      transition: opacity 0.18s ease, transform 0.24s var(--ease-spring);
+    }
+
+    .dock-app-item:hover .dock-tooltip,
+    .dock-app-item:focus-visible .dock-tooltip {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 33px;
+      align-self: center;
+      background: var(--line);
+    }
+
+    @keyframes dockBounce {
+      0%, 100% { transform: translateY(0) scale(var(--dock-scale, 1)); }
+      30% { transform: translateY(-20px) scale(var(--dock-scale, 1)); }
+      52% { transform: translateY(0) scale(var(--dock-scale, 1)); }
+      72% { transform: translateY(-8px) scale(var(--dock-scale, 1)); }
+    }
+
+    .docker-dialog {
+      width: min(680px, calc(100vw - 24px));
+      max-height: min(760px, calc(100vh - 28px));
+      margin: auto;
+      padding: 0;
+      color: var(--text);
+      background: var(--surface-raised);
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      box-shadow: 0 30px 100px rgba(10, 20, 30, 0.34);
+      backdrop-filter: blur(32px) saturate(1.5);
+      -webkit-backdrop-filter: blur(32px) saturate(1.5);
+      overflow: hidden;
+    }
+
+    .docker-dialog::backdrop {
+      background: rgba(10, 16, 24, 0.38);
+      backdrop-filter: blur(5px);
+    }
+
+    .docker-dialog[open] {
+      animation: dialogSpring 0.36s var(--ease-spring) both;
+    }
+
+    .docker-inner {
+      max-height: min(760px, calc(100vh - 28px));
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .docker-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .docker-head span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+      letter-spacing: 0.08em;
+    }
+
+    .docker-head h2 {
+      margin-top: 5px;
+      font-size: 26px;
+      font-weight: 650;
+    }
+
+    .docker-head-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .docker-head-actions button {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      transition: color 0.18s ease, background 0.18s ease, transform 0.22s var(--ease-spring);
+    }
+
+    .docker-head-actions button:hover {
+      color: var(--text);
+      background: rgba(var(--accent-rgb), 0.12);
+      transform: rotate(8deg);
+    }
+
+    .docker-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 8px;
+    }
+
+    .docker-status::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: var(--muted);
+      border-radius: 50%;
+    }
+
+    .docker-status.is-online::before {
+      background: var(--success);
+      box-shadow: 0 0 0 3px rgba(60, 125, 81, 0.12);
+    }
+
+    .docker-status.is-error::before {
+      background: var(--danger);
+    }
+
+    .docker-list {
+      display: grid;
+      gap: 7px;
+      margin-top: 13px;
+    }
+
+    .docker-container {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 11px;
+      background: color-mix(in srgb, var(--paper) 55%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+
+    .docker-container-copy {
+      display: grid;
+      min-width: 0;
+      gap: 2px;
+    }
+
+    .docker-container-copy strong,
+    .docker-container-copy span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .docker-container-copy strong {
+      font-size: 10px;
+    }
+
+    .docker-container-copy span {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 7px;
+    }
+
+    .docker-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .docker-action {
+      min-height: 27px;
+      padding: 0 8px;
+      color: var(--text-soft);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 7px;
+    }
+
+    .docker-action:hover {
+      color: var(--text);
+      border-color: var(--line-strong);
+    }
+
+    .docker-empty {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 8px;
+      line-height: 1.6;
+    }
+
+    .docker-log-dialog {
+      width: min(760px, calc(100vw - 24px));
+    }
+
+    .docker-log-output {
+      min-height: 280px;
+      max-height: 52vh;
+      margin-top: 13px;
+      padding: 13px;
+      overflow: auto;
+      color: #d8e2ea;
+      background: #081018;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 7px;
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @keyframes dialogSpring {
+      from { opacity: 0; transform: translateY(14px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding-bottom: 100px;
+      }
+
+      .mac-dock-shell {
+        bottom: 9px;
+      }
+
+      .mac-dock {
+        width: calc(100vw - 20px);
+        max-width: 100%;
+        justify-content: flex-start;
+        gap: 4px;
+        padding: 6px 8px 7px;
+        border-radius: 17px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .mac-dock::-webkit-scrollbar {
+        display: none;
+      }
+
+      .dock-app-item {
+        width: 33px;
+        height: 33px;
+        border-radius: 10px;
+      }
+
+      .dock-app-item .icon {
+        width: 17px;
+        height: 17px;
+      }
+
+      .docker-inner {
+        padding: 17px;
+      }
+
+      .docker-container {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
@@ -5333,6 +6136,21 @@
     <symbol id="i-code" viewBox="0 0 24 24">
       <path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14"/>
     </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24">
+      <path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/>
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>
+    </symbol>
+    <symbol id="i-container" viewBox="0 0 24 24">
+      <path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/>
+    </symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24">
+      <path d="m3 11 18-5v12L3 14v-3Z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+    </symbol>
     <symbol id="i-palette" viewBox="0 0 24 24">
       <path d="M12 3a9 9 0 0 0 0 18h1.5a1.5 1.5 0 0 0 0-3H12a2 2 0 0 1 0-4h6.5A2.5 2.5 0 0 0 21 11.5 9 9 0 0 0 12 3Z"/>
       <circle cx="7.5" cy="10.5" r=".75" fill="currentColor" stroke="none"/>
@@ -5405,6 +6223,10 @@
     </symbol>
     <symbol id="i-x" viewBox="0 0 24 24">
       <path d="m6 6 12 12M18 6 6 18"/>
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24">
+      <path d="M20 7v5h-5M4 17v-5h5"/>
+      <path d="M6.1 8a7 7 0 0 1 11.6-1L20 12M4 12l2.3 5a7 7 0 0 0 11.6-1"/>
     </symbol>
     <symbol id="i-sparkles" viewBox="0 0 24 24">
       <path d="m12 3 1.1 3.2L16 7.5l-2.9 1.3L12 12l-1.1-3.2L8 7.5l2.9-1.3L12 3Z"/>
@@ -5512,30 +6334,45 @@
       </div>
 
       <div class="header-actions">
-        <a class="icon-button message-trigger" id="messageTrigger" href="messagessend.html" aria-label="打开私信" data-tooltip="私信" data-magnetic>
-          <svg class="icon"><use href="#i-message-circle"></use></svg>
-          <span>私信</span>
-        </a>
-
-        <a class="icon-button" href="ide.html" aria-label="打开 Lumon Studio IDE" data-tooltip="IDE" data-magnetic>
-          <svg class="icon"><use href="#i-code"></use></svg>
-        </a>
-
-        <button class="icon-button command-trigger" id="commandTrigger" type="button" aria-label="打开命令面板" data-tooltip="命令面板" data-magnetic>
-          <svg class="icon"><use href="#i-command"></use></svg>
-          <span>命令</span>
-          <kbd>⌘ K</kbd>
-        </button>
-
-        <button class="icon-button theme-trigger" id="themeTrigger" type="button" aria-label="选择主题" aria-expanded="false" aria-controls="themePopover" data-tooltip="主题" data-magnetic>
-          <span class="theme-swatch" aria-hidden="true"></span>
-          <span id="themeName">流体玻璃</span>
-        </button>
-
-        <button class="icon-button notice-button" id="noticeTrigger" type="button" aria-label="通知" aria-expanded="false" aria-controls="noticePopover" data-tooltip="通知">
-          <svg class="icon"><use href="#i-bell"></use></svg>
-          <span class="notice-dot" id="noticeDot" hidden></span>
-        </button>
+        <div class="header-fab" id="headerFab">
+          <div class="fab-menu-items" id="headerFabMenu" role="menu" aria-label="快捷操作">
+            <a class="fab-action-item" id="messageTrigger" href="messagessend.html" role="menuitem" aria-label="打开私信">
+              <span class="f-icon"><svg class="icon"><use href="#i-message-circle"></use></svg></span>
+              <span class="f-lbl">私信</span>
+            </a>
+            <a class="fab-action-item" href="ide.html" role="menuitem" aria-label="打开 Lumon Studio IDE" data-fab-link>
+              <span class="f-icon"><svg class="icon"><use href="#i-code"></use></svg></span>
+              <span class="f-lbl">IDE</span>
+            </a>
+            <a class="fab-action-item" href="dashviewer.html" role="menuitem" aria-label="打开访问监控" data-fab-link>
+              <span class="f-icon"><svg class="icon"><use href="#i-chart"></use></svg></span>
+              <span class="f-lbl">监控</span>
+            </a>
+            <a class="fab-action-item" href="announcement.html" role="menuitem" aria-label="打开公告中心" data-route data-fab-link>
+              <span class="f-icon"><svg class="icon"><use href="#i-megaphone"></use></svg></span>
+              <span class="f-lbl">公告</span>
+            </a>
+            <button class="fab-action-item" id="commandTrigger" type="button" role="menuitem" aria-label="打开命令面板">
+              <span class="f-icon"><svg class="icon"><use href="#i-command"></use></svg></span>
+              <span class="f-lbl">命令</span>
+            </button>
+            <button class="fab-action-item" id="themeTrigger" type="button" role="menuitem" aria-label="选择主题" aria-expanded="false" aria-controls="themePopover">
+              <span class="f-icon"><span class="theme-swatch" aria-hidden="true"></span></span>
+              <span class="f-lbl" id="themeName">流体玻璃</span>
+            </button>
+            <button class="fab-action-item" id="noticeTrigger" type="button" role="menuitem" aria-label="通知" aria-expanded="false" aria-controls="noticePopover">
+              <span class="f-icon f-icon-notice">
+                <svg class="icon"><use href="#i-bell"></use></svg>
+                <span class="notice-dot" id="noticeDot" hidden></span>
+              </span>
+              <span class="f-lbl">通知</span>
+            </button>
+          </div>
+          <button class="fab-master-trigger" id="headerFabTrigger" type="button" aria-label="展开快捷操作" aria-expanded="false" aria-controls="headerFabMenu" data-magnetic>
+            <svg class="icon fab-cross-icon"><use href="#i-plus"></use></svg>
+            <span class="fab-trigger-label" id="headerFabTriggerLabel">快捷导航</span>
+          </button>
+        </div>
 
         <button class="avatar" id="avatarButton" type="button" aria-label="打开个人页面" data-magnetic data-user-avatar>访</button>
       </div>
@@ -5947,6 +6784,100 @@
     </div>
   </section>
 
+  <nav class="mac-dock-shell" aria-label="Lumon 快捷 Dock">
+    <div class="mac-dock" id="macDock">
+      <a class="dock-app-item is-running" href="#top" data-app="home" aria-label="返回首页">
+        <svg class="icon"><use href="#i-home"></use></svg>
+        <span class="dock-tooltip">控制台</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <a class="dock-app-item" href="personalindex5.html" data-app="personal" data-route data-dock-link aria-label="打开个人页">
+        <svg class="icon"><use href="#i-user"></use></svg>
+        <span class="dock-tooltip">个人页</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <a class="dock-app-item" href="messagessend.html" data-app="messages" data-route data-dock-link aria-label="打开私信">
+        <svg class="icon"><use href="#i-message-circle"></use></svg>
+        <span class="dock-tooltip">私信</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <a class="dock-app-item" href="ide.html" data-app="ide" data-route data-dock-link aria-label="打开 IDE">
+        <svg class="icon"><use href="#i-code"></use></svg>
+        <span class="dock-tooltip">Lumon IDE</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <a class="dock-app-item" href="dashviewer.html" data-app="dashboard" data-route data-dock-link aria-label="打开访问监控">
+        <svg class="icon"><use href="#i-chart"></use></svg>
+        <span class="dock-tooltip">访问监控</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <a class="dock-app-item" href="announcement.html" data-app="announcement" data-route data-dock-link aria-label="打开公告中心">
+        <svg class="icon"><use href="#i-megaphone"></use></svg>
+        <span class="dock-tooltip">公告中心</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <button class="dock-app-item" id="dockCommand" data-app="command" type="button" aria-label="打开命令面板">
+        <svg class="icon"><use href="#i-command"></use></svg>
+        <span class="dock-tooltip">命令面板</span>
+        <span class="dock-app-dot"></span>
+      </button>
+      <button class="dock-app-item" id="dockNotice" data-app="notice" type="button" aria-label="打开通知">
+        <svg class="icon"><use href="#i-bell"></use></svg>
+        <span class="dock-tooltip">通知</span>
+        <span class="dock-app-dot" id="dockNoticeDot"></span>
+      </button>
+      <span class="dock-divider" aria-hidden="true"></span>
+      <button class="dock-app-item" id="dockDocker" data-app="docker" type="button" aria-label="打开 Docker 容器">
+        <svg class="icon"><use href="#i-container"></use></svg>
+        <span class="dock-tooltip">Docker</span>
+        <span class="dock-app-dot" id="dockDockerDot"></span>
+      </button>
+      <button class="dock-app-item" id="dockTheme" data-app="theme" type="button" aria-label="切换主题">
+        <svg class="icon"><use href="#i-palette"></use></svg>
+        <span class="dock-tooltip">切换主题</span>
+      </button>
+    </div>
+  </nav>
+
+  <dialog class="docker-dialog" id="dockerDialog">
+    <div class="docker-inner">
+      <div class="docker-head">
+        <div>
+          <span>DOCKER / LOCAL CONTAINERS</span>
+          <h2>容器管理</h2>
+        </div>
+        <div class="docker-head-actions">
+          <button class="mini-button" id="dockerRefresh" type="button" aria-label="刷新 Docker">
+            <svg class="icon icon-sm"><use href="#i-refresh"></use></svg>
+          </button>
+          <button class="mini-button" id="dockerClose" type="button" aria-label="关闭">
+            <svg class="icon icon-sm"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+      </div>
+      <div class="docker-status" id="dockerStatus">等待检测本机 Docker</div>
+      <div class="docker-list" id="dockerList"></div>
+    </div>
+  </dialog>
+
+  <dialog class="docker-dialog docker-log-dialog" id="dockerLogDialog">
+    <div class="docker-inner">
+      <div class="docker-head">
+        <div>
+          <span>DOCKER / CONTAINER LOGS</span>
+          <h2 id="dockerLogTitle">容器日志</h2>
+        </div>
+        <div class="docker-head-actions">
+          <button class="mini-button" id="dockerLogClose" type="button" aria-label="关闭">
+            <svg class="icon icon-sm"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+      </div>
+      <div class="docker-status" id="dockerLogStatus">正在读取日志</div>
+      <pre class="docker-log-output" id="dockerLogOutput"></pre>
+    </div>
+  </dialog>
+
   <div class="route-curtain" id="routeCurtain" aria-hidden="true">
     <span></span>
     <span></span>
@@ -5956,8 +6887,29 @@
     <div class="route-curtain-label">PERSONAL FIELD</div>
   </div>
 
+  <div class="dynamic-island" id="dynamicIsland" role="status" aria-live="polite" aria-atomic="true">
+    <div class="island-compact-view" aria-hidden="true">
+      <span class="island-camera-dot"></span>
+      <span class="island-compact-copy"><strong id="islandCompactTitle">PELLOSY</strong></span>
+      <span class="island-wave"><i></i><i></i><i></i></span>
+    </div>
+    <div class="island-expanded-view">
+      <span class="island-toast-icon">
+        <svg class="icon icon-sm"><use id="islandToastIconUse" href="#i-check"></use></svg>
+      </span>
+      <span class="island-toast-copy">
+        <strong id="islandToastTitle">提示</strong>
+        <span id="islandToastMessage"></span>
+      </span>
+      <button class="island-close" id="islandClose" type="button" aria-label="关闭提示">
+        <svg class="icon icon-sm"><use href="#i-x"></use></svg>
+      </button>
+    </div>
+  </div>
+
   <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
 
+  <script src="visit-track.js"></script>
   <script src="cloud-api.js"></script>
   <script>
     (() => {
@@ -6533,6 +7485,7 @@
         const count = $("#noticeCount");
         const clear = $("#noticeClear");
         const dot = $("#noticeDot");
+        const dockNoticeButton = $("#dockNotice");
         const cacheKey = "pellosy.notifications.cache.v1";
         let items = [];
         let loading = false;
@@ -6589,6 +7542,7 @@
           const unread = items.filter((item) => !item.read).length;
           count.textContent = `${unread} new`;
           dot.hidden = unread === 0;
+          dockNoticeButton?.classList.toggle("is-running", unread > 0);
           clear.disabled = unread === 0;
           list.replaceChildren();
           if (!items.length) {
@@ -6693,6 +7647,206 @@
             control.style.setProperty("--magnet-x", "0px");
             control.style.setProperty("--magnet-y", "0px");
           });
+        });
+      }
+
+      function initializeMacDock() {
+        const dock = $("#macDock");
+        if (!dock) return;
+        const items = $$(".dock-app-item", dock);
+        const maxDistance = 145;
+        const maxScale = 1.58;
+
+        const resetDock = () => {
+          items.forEach((item) => {
+            item.style.setProperty("--dock-scale", "1");
+            item.style.setProperty("--dock-lift", "0px");
+            item.style.zIndex = "";
+          });
+        };
+
+        dock.addEventListener("pointermove", (event) => {
+          if (isTouch || reduceMotion) return;
+          const dockRect = dock.getBoundingClientRect();
+          const pointerX = event.clientX - dockRect.left + dock.scrollLeft;
+          items.forEach((item) => {
+            const center = item.offsetLeft + item.offsetWidth / 2;
+            const distance = Math.abs(pointerX - center);
+            const influence = distance < maxDistance
+              ? Math.cos((distance / maxDistance) * Math.PI / 2)
+              : 0;
+            const scale = 1 + (maxScale - 1) * Math.max(0, influence);
+            item.style.setProperty("--dock-scale", scale.toFixed(3));
+            item.style.setProperty("--dock-lift", `${(-(scale - 1) * 15).toFixed(1)}px`);
+            item.style.zIndex = String(Math.round(scale * 10));
+          });
+        }, { passive: true });
+
+        dock.addEventListener("pointerleave", resetDock);
+        items.forEach((item) => {
+          item.addEventListener("click", () => {
+            item.classList.remove("is-bouncing");
+            void item.offsetWidth;
+            item.classList.add("is-bouncing");
+            window.setTimeout(() => item.classList.remove("is-bouncing"), 760);
+          });
+        });
+        $("#dockTheme")?.addEventListener("click", () => cycleTheme());
+        $("#dockCommand")?.addEventListener("click", () => openCommand());
+        $("#dockNotice")?.addEventListener("click", () => noticeTrigger?.click());
+      }
+
+      function initializeDockerPanel() {
+        const button = $("#dockDocker");
+        const dialog = $("#dockerDialog");
+        const list = $("#dockerList");
+        const status = $("#dockerStatus");
+        const dot = $("#dockDockerDot");
+        const logDialog = $("#dockerLogDialog");
+        const logTitle = $("#dockerLogTitle");
+        const logStatus = $("#dockerLogStatus");
+        const logOutput = $("#dockerLogOutput");
+        if (!button || !dialog || !list || !status) return;
+
+        const setStatus = (message, tone = "") => {
+          status.textContent = message;
+          status.classList.toggle("is-online", tone === "online");
+          status.classList.toggle("is-error", tone === "error");
+        };
+
+        const showLogs = async (container) => {
+          if (!logDialog || !logOutput || !logStatus) return;
+          logTitle.textContent = `日志 · ${container.name || container.id.slice(0, 12)}`;
+          logStatus.textContent = "正在读取容器日志";
+          logStatus.className = "docker-status";
+          logOutput.textContent = "正在加载…";
+          logDialog.showModal();
+          try {
+            const response = await fetch(
+              `/api/docker/logs?id=${encodeURIComponent(container.id)}&tail=160`,
+              { cache: "no-store" }
+            );
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || result.success === false) {
+              throw new Error(result.message || `日志接口返回 ${response.status}`);
+            }
+            logOutput.textContent = result.logs || "容器当前没有日志输出。";
+            logStatus.textContent = "日志已加载 · 最近 160 行";
+            logStatus.className = "docker-status is-online";
+            logOutput.scrollTop = logOutput.scrollHeight;
+          } catch (error) {
+            logOutput.textContent = error.message || "Docker 日志读取失败";
+            logStatus.textContent = "日志读取失败";
+            logStatus.className = "docker-status is-error";
+          }
+        };
+
+        const renderContainers = (payload) => {
+          list.replaceChildren();
+          if (!payload.available) {
+            setStatus(payload.message || "本机 Docker 不可用", "error");
+            dot?.classList.remove("is-running");
+            const empty = document.createElement("div");
+            empty.className = "docker-empty";
+            empty.textContent = "请在本地运行 node server-local.mjs，并确认 Docker Desktop 已启动。Cloudflare 线上环境无法访问本机 Docker。";
+            list.appendChild(empty);
+            return;
+          }
+          setStatus(
+            `${payload.message || "Docker 已连接"}${payload.version ? ` · Server ${payload.version}` : ""} · ${payload.running}/${payload.total} 运行中`,
+            "online"
+          );
+          dot?.classList.add("is-running");
+          if (!payload.containers?.length) {
+            const empty = document.createElement("div");
+            empty.className = "docker-empty";
+            empty.textContent = "当前没有容器。创建容器后，这里会显示名称、镜像、状态和端口。";
+            list.appendChild(empty);
+            return;
+          }
+          payload.containers.forEach((container) => {
+            const item = document.createElement("article");
+            item.className = "docker-container";
+            item.innerHTML = `
+              <span class="docker-container-copy">
+                <strong></strong>
+                <span></span>
+                <span></span>
+              </span>
+              <span class="docker-actions"></span>
+            `;
+            $("strong", item).textContent = container.name || container.id.slice(0, 12);
+            const lines = item.querySelectorAll(".docker-container-copy span");
+            lines[0].textContent = `${container.image || "未知镜像"} · ${container.status || container.state}`;
+            lines[1].textContent = [container.ports, container.runningFor].filter(Boolean).join(" · ") || "无端口映射";
+            const actions = $(".docker-actions", item);
+            const primary = container.running ? "stop" : "start";
+            const logsButton = document.createElement("button");
+            logsButton.type = "button";
+            logsButton.className = "docker-action";
+            logsButton.textContent = "日志";
+            logsButton.addEventListener("click", () => showLogs(container));
+            actions.appendChild(logsButton);
+            [primary, "restart"].forEach((action) => {
+              const actionButton = document.createElement("button");
+              actionButton.type = "button";
+              actionButton.className = "docker-action";
+              actionButton.textContent = action === "start" ? "启动" : action === "stop" ? "停止" : "重启";
+              actionButton.addEventListener("click", async () => {
+                actionButton.disabled = true;
+                setStatus(`正在${actionButton.textContent} ${container.name || container.id.slice(0, 12)}…`);
+                try {
+                  const response = await fetch("/api/docker/action", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: container.id, action })
+                  });
+                  const result = await response.json().catch(() => ({}));
+                  if (!response.ok || result.success === false) {
+                    throw new Error(result.message || `Docker 操作失败 (${response.status})`);
+                  }
+                  showToast("Docker 操作完成", `${container.name || container.id.slice(0, 12)} · ${actionButton.textContent}`, "container");
+                  await refresh();
+                } catch (error) {
+                  setStatus(error.message || "Docker 操作失败", "error");
+                  actionButton.disabled = false;
+                }
+              });
+              actions.appendChild(actionButton);
+            });
+            list.appendChild(item);
+          });
+        };
+
+        const refresh = async () => {
+          setStatus("正在检测本机 Docker…");
+          list.replaceChildren();
+          try {
+            const response = await fetch("/api/docker/status", { cache: "no-store" });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+              throw new Error(payload.message || `Docker 接口返回 ${response.status}`);
+            }
+            renderContainers(payload);
+          } catch (error) {
+            setStatus(error.message || "Docker 接口不可用", "error");
+            dot?.classList.remove("is-running");
+          }
+        };
+
+        button.addEventListener("click", () => {
+          if (typeof dialog.showModal === "function") dialog.showModal();
+          else dialog.setAttribute("open", "");
+          refresh();
+        });
+        $("#dockerRefresh")?.addEventListener("click", refresh);
+        $("#dockerClose")?.addEventListener("click", () => dialog.close());
+        $("#dockerLogClose")?.addEventListener("click", () => logDialog?.close());
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) dialog.close();
+        });
+        logDialog?.addEventListener("click", (event) => {
+          if (event.target === logDialog) logDialog.close();
         });
       }
 
@@ -7848,9 +9002,47 @@
       const themeTrigger = $("#themeTrigger");
       const noticePopover = $("#noticePopover");
       const noticeTrigger = $("#noticeTrigger");
+      const headerFab = $("#headerFab");
+      const headerFabTrigger = $("#headerFabTrigger");
       const weatherPopover = $("#weatherPopover");
       const weatherTrigger = $("#weatherTrigger");
       let activeTheme = root.dataset.theme || "glass";
+
+      function setHeaderFab(open, restoreFocus = false) {
+        if (!headerFab || !headerFabTrigger) return;
+        headerFab.classList.toggle("is-expanded", open);
+        headerFabTrigger.setAttribute("aria-expanded", String(open));
+        headerFabTrigger.setAttribute("aria-label", open ? "收起快捷操作" : "展开快捷操作");
+        $("#headerFabTriggerLabel").textContent = open ? "收起导航" : "快捷导航";
+        if (open) {
+          window.setTimeout(() => {
+            $(".fab-action-item", headerFab)?.focus({ preventScroll: true });
+          }, 120);
+        } else if (restoreFocus) {
+          headerFabTrigger.focus({ preventScroll: true });
+        }
+      }
+
+      headerFabTrigger?.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setHeaderFab(!headerFab.classList.contains("is-expanded"));
+      });
+
+      headerFab?.addEventListener("click", (event) => {
+        if (event.target.closest("[data-fab-link], #commandTrigger")) {
+          setHeaderFab(false);
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest("#headerFab")) setHeaderFab(false);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && headerFab?.classList.contains("is-expanded")) {
+          setHeaderFab(false, true);
+        }
+      });
 
       function syncThemeUI(theme) {
         const name = themeNames[theme] || themeNames.glass;
@@ -8444,38 +9636,67 @@
 
       /* Toast notifications */
       const toastStack = $("#toastStack");
-      const toastIcons = ["check", "sparkles", "palette", "plus", "timer", "search"];
+      const toastIcons = ["check", "sparkles", "palette", "plus", "timer", "search", "container"];
+      const dynamicIsland = $("#dynamicIsland");
+      let islandCollapseTimer = 0;
+      let islandHideTimer = 0;
 
       function showToast(title, message, iconName = "check") {
         const safeIcon = toastIcons.includes(iconName) ? iconName : "check";
-        const toast = document.createElement("div");
-        toast.className = "toast";
-        toast.innerHTML = `
-          <span class="toast-icon"><svg class="icon icon-sm"><use href="#i-${safeIcon}"></use></svg></span>
-          <span class="toast-copy"></span>
-          <button class="toast-close" type="button" aria-label="关闭通知">
-            <svg class="icon icon-sm"><use href="#i-x"></use></svg>
-          </button>
-        `;
-        const copy = $(".toast-copy", toast);
-        const titleNode = document.createElement("strong");
-        titleNode.textContent = title;
-        const messageNode = document.createElement("span");
-        messageNode.textContent = message;
-        copy.append(titleNode, messageNode);
-        toastStack.appendChild(toast);
-
-        const dismiss = () => {
-          if (!toast.isConnected) {
-            return;
-          }
-          toast.classList.add("is-out");
-          window.setTimeout(() => toast.remove(), 300);
-        };
-
-        $(".toast-close", toast).addEventListener("click", dismiss);
-        window.setTimeout(dismiss, 4200);
+        if (!dynamicIsland) return;
+        window.clearTimeout(islandCollapseTimer);
+        window.clearTimeout(islandHideTimer);
+        $("#islandCompactTitle").textContent = title;
+        $("#islandToastTitle").textContent = title;
+        $("#islandToastMessage").textContent = message;
+        $("#islandToastIconUse").setAttribute("href", `#i-${safeIcon}`);
+        dynamicIsland.classList.remove("is-visible", "is-expanded");
+        void dynamicIsland.offsetWidth;
+        dynamicIsland.classList.add("is-visible");
+        window.requestAnimationFrame(() => {
+          dynamicIsland.classList.add("is-expanded");
+        });
+        islandCollapseTimer = window.setTimeout(() => {
+          dynamicIsland.classList.remove("is-expanded");
+        }, reduceMotion ? 1200 : 3100);
+        islandHideTimer = window.setTimeout(() => {
+          dynamicIsland.classList.remove("is-visible", "is-expanded");
+        }, reduceMotion ? 1500 : 4100);
       }
+
+      dynamicIsland?.addEventListener("click", (event) => {
+        if (event.target.closest("#islandClose")) return;
+        window.clearTimeout(islandCollapseTimer);
+        window.clearTimeout(islandHideTimer);
+        dynamicIsland.classList.toggle("is-expanded");
+        if (!dynamicIsland.classList.contains("is-expanded")) {
+          islandHideTimer = window.setTimeout(() => {
+            dynamicIsland.classList.remove("is-visible", "is-expanded");
+          }, 1300);
+        }
+      });
+
+      dynamicIsland?.addEventListener("pointerenter", () => {
+        window.clearTimeout(islandCollapseTimer);
+        window.clearTimeout(islandHideTimer);
+      });
+
+      dynamicIsland?.addEventListener("pointerleave", () => {
+        if (!dynamicIsland.classList.contains("is-visible")) return;
+        islandCollapseTimer = window.setTimeout(() => {
+          dynamicIsland.classList.remove("is-expanded");
+        }, 900);
+        islandHideTimer = window.setTimeout(() => {
+          dynamicIsland.classList.remove("is-visible", "is-expanded");
+        }, 2100);
+      });
+
+      $("#islandClose")?.addEventListener("click", (event) => {
+        event.stopPropagation();
+        window.clearTimeout(islandCollapseTimer);
+        window.clearTimeout(islandHideTimer);
+        dynamicIsland?.classList.remove("is-visible", "is-expanded");
+      });
 
       /* Command palette */
       const commandLayer = $("#commandLayer");
@@ -8625,6 +9846,30 @@
           action: () => {
             closeCommand();
             transitionTo("ide.html", "LUMON STUDIO");
+          }
+        },
+        {
+          group: "Navigate",
+          title: "访问监控",
+          detail: "查看网站访问趋势与实时明细",
+          icon: "chart",
+          key: "V",
+          keywords: "analytics dashboard visits traffic 访问 监控 统计",
+          action: () => {
+            closeCommand();
+            transitionTo("dashviewer.html", "ACCESS OBSERVATORY");
+          }
+        },
+        {
+          group: "Navigate",
+          title: "公告中心",
+          detail: "查看系统更新、维护和功能公告",
+          icon: "megaphone",
+          key: "A",
+          keywords: "announcement notice news 公告 更新 维护",
+          action: () => {
+            closeCommand();
+            transitionTo("announcement.html", "ANNOUNCEMENTS");
           }
         },
         {
@@ -8882,6 +10127,8 @@
       initializeNotifications();
       initializeTextWave();
       initializeMagneticControls();
+      initializeMacDock();
+      initializeDockerPanel();
       initializeMotionExtras();
       initializeWeather();
       initializePosterField();
