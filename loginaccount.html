@@ -618,6 +618,24 @@
       accent-color: var(--ink);
     }
 
+    .terms-link {
+      color: var(--ink);
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, var(--ink) 34%, transparent);
+      text-underline-offset: 3px;
+    }
+
+    .terms-link:hover {
+      color: var(--ink);
+      background: var(--yellow);
+    }
+
+    .site-footer a:hover {
+      color: var(--ink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
     .turnstile-slot {
       min-height: 58px;
       padding: 7px 0;
@@ -1453,7 +1471,10 @@
               <input id="registerConfirm" name="confirm" type="password" minlength="8" maxlength="256" autocomplete="new-password" placeholder="再次输入密码" required>
             </div>
             <div class="field-row">
-              <label class="check"><input id="registerTerms" type="checkbox">同意账户使用与隐私约定</label>
+              <label class="check">
+                <input id="registerTerms" type="checkbox">
+                同意 <a class="terms-link" href="useragreement.html" data-route>《Lumon 用户条例》</a>
+              </label>
             </div>
             <div class="turnstile-slot">
               <div id="turnstile-register" aria-label="注册人机验证"></div>
@@ -1498,7 +1519,7 @@
 
     <footer class="site-footer">
       <span>LUMON / ACCOUNT / 2026</span>
-      <span>Cloudflare Pages Functions · D1 ready</span>
+      <span>Cloudflare Pages Functions · D1 ready · <a href="useragreement.html" data-route>用户条例</a></span>
     </footer>
   </div>
 
@@ -1874,7 +1895,7 @@
           return;
         }
         if (!$("#registerTerms").checked) {
-          setFormStatus("register", "请先同意账户使用与隐私约定", "error");
+          setFormStatus("register", "请先同意《Lumon 用户条例》", "error");
           return;
         }
         setFormStatus("register", "正在创建账户…");
