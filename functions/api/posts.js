@@ -8,7 +8,7 @@ export async function onRequestGet(context) {
     // 🚨 安全拦截：检查全新绑定的 SOCIAL_DB
     if (!env.SOCIAL_DB) {
         return new Response(JSON.stringify([
-            { username: "System@Pellosy", content: "⚡ Cloudflare 全栈 Function 环境已就绪！请前往 Dashboard 绑定 KV 命名空间 'SOCIAL_DB' 激活持久化存储。", timestamp: Date.now() }
+            { username: "System@Lumon", content: "⚡ Cloudflare 全栈 Function 环境已就绪！请前往 Dashboard 绑定 KV 命名空间 'SOCIAL_DB' 激活持久化存储。", timestamp: Date.now() }
         ]), { headers: { "Content-Type": "application/json" } });
     }
 

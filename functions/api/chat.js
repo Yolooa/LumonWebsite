@@ -28,7 +28,7 @@ export async function onRequest(context) {
 
             const response = await context.env.AI.run(activeModel, {
                 messages: [
-                    { role: 'system', content: '你是 Pellosy AI，一个由边缘网络驱动的极简高效率智能助理。' },
+                    { role: 'system', content: '你是 Lumon AI，一个由边缘网络驱动的极简高效率智能助理。' },
                     { role: 'user', content: prompt }
                 ]
             });

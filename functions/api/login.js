@@ -10,7 +10,7 @@ import {
   requireDb,
   requireMethod
 } from "./_shared.js";
-import { hashPassword, verifyPassword } from "./_security.js";
+import { hashPassword, signDesktopTicket, verifyPassword } from "./_security.js";
 
 export async function onRequest(context) {
   try {
@@ -82,8 +82,12 @@ export async function onRequest(context) {
 
     const user = publicUser(row);
     const session = await createSessionResponse(user, context.env, body.remember !== false);
+    const response = { success: true, user };
+    if (body.desktopChallenge) {
+      response.desktopTicket = await signDesktopTicket(user, context.env, body.desktopChallenge);
+    }
     return json(
-      { success: true, user },
+      response,
       200,
       { "Set-Cookie": session.cookie }
     );

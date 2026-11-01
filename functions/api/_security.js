@@ -79,6 +79,66 @@ export async function verifySessionToken(token, env) {
   }
 }
 
+export async function signDesktopTicket(user, env, challenge, maxAge = 180) {
+  const normalizedChallenge = String(challenge || "");
+  if (normalizedChallenge.length < 32 || normalizedChallenge.length > 128) {
+    const error = new Error("桌面登录挑战无效");
+    error.code = "INVALID_DESKTOP_CHALLENGE";
+    error.status = 400;
+    throw error;
+  }
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    kind: "desktop_login",
+    challenge: normalizedChallenge,
+    sub: user.id,
+    username: user.username,
+    name: user.name || user.display_name || user.username,
+    email: user.email || "",
+    iat: now,
+    exp: now + maxAge
+  };
+  const encodedPayload = base64Url(encoder.encode(JSON.stringify(payload)));
+  const key = await crypto.subtle.importKey(
+    "raw",
+    sessionKey(env),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(encodedPayload));
+  return `${encodedPayload}.${base64Url(new Uint8Array(signature))}`;
+}
+
+export async function verifyDesktopTicket(token, env, challenge) {
+  if (!token || !token.includes(".")) return null;
+  const [encodedPayload, encodedSignature] = String(token).split(".");
+  if (!encodedPayload || !encodedSignature) return null;
+  try {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      sessionKey(env),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"]
+    );
+    const valid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      fromBase64Url(encodedSignature),
+      encoder.encode(encodedPayload)
+    );
+    if (!valid) return null;
+    const payload = JSON.parse(new TextDecoder().decode(fromBase64Url(encodedPayload)));
+    if (payload?.kind !== "desktop_login") return null;
+    if (payload.challenge !== String(challenge || "")) return null;
+    if (!payload?.sub || Number(payload.exp || 0) <= Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 export function sessionCookie(token, maxAge = DEFAULT_SESSION_SECONDS) {
   const maxAgePart = maxAge ? `; Max-Age=${Math.max(0, Math.floor(maxAge))}` : "";
   return `${SESSION_COOKIE}=${token}; Path=/; HttpOnly; Secure; SameSite=Lax${maxAgePart}`;

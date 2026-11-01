@@ -14,7 +14,7 @@ import {
   uniqueId,
   validEmail
 } from "./_shared.js";
-import { hashPassword } from "./_security.js";
+import { hashPassword, signDesktopTicket } from "./_security.js";
 
 export async function onRequest(context) {
   try {
@@ -69,6 +69,10 @@ export async function onRequest(context) {
       displayName
     };
     const session = await createSessionResponse(user, context.env, true);
+    const response = { success: true, user };
+    if (body.desktopChallenge) {
+      response.desktopTicket = await signDesktopTicket(user, context.env, body.desktopChallenge);
+    }
 
     try {
       await db.prepare(
@@ -80,7 +84,7 @@ export async function onRequest(context) {
     }
 
     return json(
-      { success: true, user },
+      response,
       201,
       { "Set-Cookie": session.cookie }
     );
