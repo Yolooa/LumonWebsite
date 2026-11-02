@@ -12,3 +12,8 @@ PISTON_API_URL = "https://emkc.org/api/v2/piston"
 binding = "DB"
 database_name = "lumonsky-db"
 database_id = "7d77af61-0302-4a14-a5b3-e2614fce86e0"
+
+# 创建同名 R2 Bucket 后，Pages Functions 通过 ASSETS 绑定读写私有文件。
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "lumonsky-resource-space"

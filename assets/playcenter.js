@@ -12,7 +12,7 @@
     reaction: { title: "反应挑战", icon: "↯", category: "reaction", scoreLabel: "反应时间", bestLabel: "最快反应", help: "点击开始，等待绿色出现后立刻点击，或按空格。共 5 轮，提前点击需要重试。", unit: " ms" }
   };
   Object.setPrototypeOf(games, null);
-  const knownGameId = (id) => typeof id === "string" && (Boolean(games[id]) || /^game_[a-f0-9-]{36}$/.test(id));
+  const knownGameId = (id) => typeof id === "string" && (Boolean(games[id]) || id === "uno" || id === "landlord" || /^game_[a-f0-9-]{36}$/.test(id));
 
   function readState() {
     try {
@@ -214,6 +214,7 @@
     currentId = id;
     const game = games[id];
     dialog.classList.toggle("custom-game", Boolean(game.community));
+    dialog.classList.toggle("card-game", Boolean(game.wide));
     $("#restartGame").textContent = game.community ? "↻ 重新载入" : "↻ 重新开始";
     $("#gameTitle").textContent = game.title;
     $("#scoreLabel").textContent = game.scoreLabel;
@@ -232,6 +233,7 @@
   function cleanupGame() {
     currentGame?.destroy(); currentGame = null; currentId = null;
     document.body.classList.remove("game-open");
+    dialog.classList.remove("custom-game", "card-game");
     document.body.append($("#toast"));
     renderRecords();
     if (document.fullscreenElement === dialog) void document.exitFullscreen().catch(() => {});
@@ -971,20 +973,60 @@
   }
 
   let headlineTimer;
+  let headlinePhrase = "PRESS PLAY.";
+  const headlineButton = $("#headlineTrigger");
+  function fitHeadline() {
+    const line = headlineButton.parentElement;
+    const font = getComputedStyle($("#heroTitle"));
+    const ruler = document.createElement("span");
+    ruler.style.cssText = "position:fixed;visibility:hidden;white-space:pre;pointer-events:none;left:-10000px;top:0";
+    ruler.style.fontFamily = font.fontFamily;
+    ruler.style.fontSize = font.fontSize;
+    ruler.style.fontWeight = font.fontWeight;
+    ruler.style.fontStyle = font.fontStyle;
+    ruler.style.letterSpacing = font.letterSpacing;
+    ruler.textContent = headlinePhrase + " ▏";
+    document.body.append(ruler);
+    const size = parseFloat(font.fontSize);
+    const ratio = Math.min(1, (line.clientWidth - 10) / Math.max(1, ruler.getBoundingClientRect().width));
+    headlineButton.style.fontSize = `${size * ratio}px`;
+    ruler.remove();
+  }
+  function updateHeadline(phrase, complete) {
+    const secret = phrase === "Play Has No Limits." && complete;
+    if (headlinePhrase !== phrase) { headlinePhrase = phrase; fitHeadline(); }
+    headlineButton.classList.toggle("has-secret", secret);
+    headlineButton.setAttribute("aria-disabled", String(!secret));
+    headlineButton.setAttribute("aria-label", secret ? "Play Has No Limits. 点击开启 PlayStation 彩蛋" : phrase);
+    headlineButton.tabIndex = secret ? 0 : -1;
+    $("#heroTitle").setAttribute("aria-label", `PAUSE WORK. ${phrase}`);
+    $("#headlineSecret").classList.toggle("visible", secret);
+  }
+  headlineButton.addEventListener("click", () => {
+    if (headlineButton.classList.contains("has-secret")) window.LumonPlayStation?.activate();
+  });
+  if (window.ResizeObserver) new ResizeObserver(fitHeadline).observe(headlineButton.parentElement);
+  else window.addEventListener("resize", fitHeadline);
+  document.fonts?.ready.then(fitHeadline);
   function typeHeadline() {
     clearTimeout(headlineTimer);
     const target = $("#typedHeadline");
-    const phrases = ["PRESS PLAY.", "MAKE A MOVE.", "JUST ONE MORE.", "PLAY A LITTLE."];
-    if (reducedMotion.matches) { target.textContent = phrases[0]; return; }
+    const phrases = ["PRESS PLAY.", "Play Has No Limits.", "MAKE A MOVE.", "ONE MORE ROUND.", "LESS SCROLL. MORE PLAY.", "JUST FOR THE JOY.", "YOUR NEXT HIGH SCORE.", "CREATE. SHARE. PLAY.", "GOOD TIMES LOADING.", "PLAY A LITTLE."];
+    if (reducedMotion.matches) { target.textContent = phrases[1]; updateHeadline(phrases[1], true); fitHeadline(); return; }
+    target.textContent = phrases[0]; updateHeadline(phrases[0], false); fitHeadline();
     let index = 0; let count = phrases[0].length; let deleting = true;
     function tick() {
-      if (document.hidden || dialog.open) { headlineTimer = setTimeout(tick, 700); return; }
+      if (document.hidden || document.querySelector("dialog[open]") || document.body.classList.contains("ps-active") ||
+        (headlineButton.classList.contains("has-secret") && (headlineButton.matches(":hover") || document.activeElement === headlineButton))) {
+        headlineTimer = setTimeout(tick, 300); return;
+      }
       const phrase = phrases[index];
       count += deleting ? -1 : 1;
       target.textContent = phrase.slice(0, Math.max(0, count));
+      updateHeadline(phrase, count >= phrase.length);
       let delay = deleting ? 38 : 60 + Math.random() * 50;
-      if (!deleting && count >= phrase.length) { deleting = true; delay = 2700; }
-      else if (deleting && count <= 0) { deleting = false; index = (index + 1) % phrases.length; delay = 320; }
+      if (!deleting && count >= phrase.length) { deleting = true; delay = phrase === "Play Has No Limits." ? 8500 : 2700; }
+      else if (deleting && count <= 0) { deleting = false; index = (index + 1) % phrases.length; updateHeadline(phrases[index], false); delay = 320; }
       headlineTimer = setTimeout(tick, delay);
     }
     headlineTimer = setTimeout(tick, 3100);
@@ -1001,7 +1043,7 @@
   clock(); setInterval(() => { if (!document.hidden) clock(); }, 15000);
   renderFavorites(); renderRecords(); filterGames(); updateTheme(); opening(); typeHeadline();
   window.LumonPlay = {
-    toast, open: openGame,
+    toast, open: openGame, record: best,
     refresh: () => { renderFavorites(); renderRecords(); filterGames(); },
     setFilter(value) { filter = value; filterGames(); },
     register(items) {
@@ -1010,6 +1052,12 @@
         games[item.id] = { ...item, community: true, icon: "✦", scoreLabel: "", bestLabel: "",
           help: item.instructions || "按游戏中的说明操作。点击右上角退出，返回游戏大厅。" };
       }
+      renderFavorites(); renderRecords(); filterGames();
+    },
+    registerBuiltin(id, definition, factory) {
+      if (games[id] || typeof factory !== "function") return;
+      games[id] = { ...definition, community: false };
+      factories[id] = factory;
       renderFavorites(); renderRecords(); filterGames();
     },
     reconcile(ids) {

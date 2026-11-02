@@ -4,12 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#e8eef5">
-  <meta name="description" content="Lumon Play 游戏大厅。2048、贪吃蛇、记忆翻牌与反应挑战，给今天留一点好玩的时间。">
+  <meta name="description" content="Lumon Play 游戏大厅。2048、贪吃蛇、记忆翻牌、反应挑战、UNO Lite 和斗地主，给今天留一点好玩的时间。">
   <title>Play / Lumon 游戏大厅</title>
   <script src="theme-sync.js"></script>
   <link rel="stylesheet" href="assets/playcenter.css?v=community-1">
   <link rel="stylesheet" href="assets/playcenter-community.css?v=community-1">
-  <script src="assets/playcenter.js?v=community-1" defer></script>
+  <link rel="stylesheet" href="assets/playcenter-easter.css?v=ps-1">
+  <link rel="stylesheet" href="assets/playcenter-classic.css?v=classic-4">
+  <script src="assets/playcenter-easter.js?v=ps-1" defer></script>
+  <script src="assets/playcenter.js?v=ps-2" defer></script>
+  <script src="assets/playcenter-classic.js?v=classic-4" defer></script>
   <script src="assets/playcenter-community.js?v=community-1" defer></script>
   <script src="visit-track.js" defer></script>
 </head>
@@ -38,7 +42,7 @@
 
   <main class="page">
     <section class="hero reveal" aria-labelledby="heroTitle">
-      <div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> LUMON PLAYGROUND <span class="edition">VOL. 001 / 随时开玩</span></div><h1 id="heroTitle" aria-label="给今天，一点好玩。"><span class="hero-fixed">PAUSE WORK.</span><span class="typing-line"><span id="typedHeadline" aria-hidden="true">PRESS PLAY.</span><span class="type-caret" aria-hidden="true"></span></span></h1><div class="hero-bottom"><p>给今天，一点好玩。<br><span>暂存忙碌，让快乐先加载。</span></p><button class="random-button" id="randomGame"><svg><use href="#p-shuffle"/></svg> 随机开一局 <span>↗</span></button></div></div>
+      <div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> LUMON PLAYGROUND <span class="edition">VOL. 001 / 随时开玩</span></div><h1 id="heroTitle" aria-label="给今天，一点好玩。"><span class="hero-fixed">PAUSE WORK.</span><span class="typing-line"><button class="headline-trigger" id="headlineTrigger" type="button" aria-label="PRESS PLAY." aria-disabled="true" tabindex="-1"><span id="typedHeadline" aria-hidden="true">PRESS PLAY.</span><span class="type-caret" aria-hidden="true"></span></button></span><span class="headline-secret" id="headlineSecret" aria-hidden="true">有些快乐，藏在字里。<span>点击文字 ↗</span></span></h1><div class="hero-bottom"><p>给今天，一点好玩。<br><span>暂存忙碌，让快乐先加载。</span></p><button class="random-button" id="randomGame"><svg><use href="#p-shuffle"/></svg> 随机开一局 <span>↗</span></button></div></div>
       <div class="hero-note"><span class="note-orbit" aria-hidden="true">✳</span><span>JUST ONE<br>MORE ROUND.</span><small>不必每一刻<br>都那么有用。</small></div>
     </section>
 

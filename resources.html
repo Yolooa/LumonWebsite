@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="glass">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#e8eef5">
+  <meta name="description" content="Lumon 个人资源空间，安全保存和管理自己的文件。">
+  <title>个人资源空间 / Lumon</title>
+  <script src="theme-sync.js"></script>
+  <link rel="stylesheet" href="assets/resources.css?v=2">
+  <script src="assets/resources.js?v=2" defer></script>
+</head>
+<body>
+  <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="r-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M3.5 10h17"/></symbol>
+    <symbol id="r-upload" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></symbol>
+    <symbol id="r-download" viewBox="0 0 24 24"><path d="M12 4v12m5-5-5 5-5-5"/><path d="M5 16v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="r-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="r-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="r-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"/></symbol>
+    <symbol id="r-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="r-file" viewBox="0 0 24 24"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10Z"/><path d="M13 3v7h7M8 15h8m-8 3h8"/></symbol>
+  </defs></svg>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">L.</span><span><strong>LUMON</strong><small>PERSONAL RESOURCE SPACE</small></span></a>
+    <nav aria-label="主导航"><a href="index.html">工作空间</a><a href="playcenter.html">游戏大厅</a><a href="messagessend.html">私信</a></nav>
+    <div class="top-actions"><button id="themeToggle" class="theme-toggle" type="button" title="切换主题" aria-label="切换主题"><span class="theme-glyph">◐</span><span id="themeName">流体玻璃</span></button><a class="home-link" href="index.html" aria-label="返回工作空间">↗</a></div>
+  </header>
+  <main class="workspace">
+    <div class="page-kicker"><span class="live-dot"></span> YOUR SPACE / PRIVATE BY DEFAULT <button id="openRules" type="button" class="text-link">使用条例 ↗</button></div>
+    <section class="heading-row">
+      <div><p class="eyebrow">LUMON CLOUD / 01</p><h1>个人资源空间<span>.</span></h1><p class="heading-sub">重要的文件，放在只属于你的地方。</p></div>
+      <div class="quota" aria-label="空间用量"><div class="quota-top"><span>我的空间</span><strong id="quotaLabel">载入中…</strong></div><div class="quota-track"><span id="quotaBar"></span></div><small id="quotaMeta">个人私有存储</small></div>
+    </section>
+    <section class="storage-layout">
+      <div class="files-column">
+        <div class="upload-zone" id="dropZone">
+          <input id="fileInput" type="file" hidden accept=".pdf,.docx,.xlsx,.pptx,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.zip,.mp3,.wav,.mp4">
+          <div class="upload-symbol"><svg><use href="#r-upload"/></svg></div>
+          <div class="upload-copy"><strong>把文件放进你的空间</strong><span>拖到这里，或选择本地文件 · 单个文件不超过 20 MiB</span></div>
+          <button id="chooseFile" class="primary-button" type="button"><svg><use href="#r-upload"/></svg> 选择文件</button>
+          <p class="upload-note"><svg><use href="#r-shield"/></svg> 仅限本人访问 · 上传前需确认安全条例</p>
+          <div class="upload-consent"><input id="uploadConsent" type="checkbox"><label for="uploadConsent">我已阅读并同意上传安全条例</label><button id="showUploadRules" type="button">查看条例</button></div>
+        </div>
+        <div class="upload-progress" id="uploadProgress" hidden><div class="progress-meta"><span id="progressName">正在上传</span><strong id="progressPercent">0%</strong></div><progress id="progressBar" max="100" value="0"></progress></div>
+        <div class="file-toolbar"><div class="filter-tabs" role="group" aria-label="文件类别"><button class="active" data-filter="all" aria-pressed="true">全部 <span id="fileCount">0</span></button><button data-filter="document" aria-pressed="false">文档</button><button data-filter="image" aria-pressed="false">图片</button><button data-filter="audio" aria-pressed="false">音频</button><button data-filter="video" aria-pressed="false">视频</button><button data-filter="archive" aria-pressed="false">压缩包</button></div><label class="search-box"><svg><use href="#r-search"/></svg><input id="fileSearch" type="search" placeholder="搜索我的文件" aria-label="搜索我的文件"></label></div>
+        <div id="fileList" class="file-list" aria-live="polite"></div>
+        <div id="emptyState" class="empty-state" hidden><div class="empty-icon"><svg><use href="#r-folder"/></svg></div><h2 id="emptyTitle">这里还没有文件</h2><p id="emptyCopy">上传第一份资源，让它在需要时随时可用。</p></div>
+        <div class="list-status"><span id="statusText" role="status">正在连接个人空间…</span><button id="refreshFiles" type="button">↻ 刷新</button></div>
+      </div>
+      <aside class="security-panel"><div class="security-mark"><svg><use href="#r-shield"/></svg></div><p class="eyebrow">PRIVATE STORAGE / USAGE GUARD</p><h2>你的文件，<br>只属于你。</h2><p class="security-copy">文件通过登录身份验证。其他用户无法搜索、查看或下载你的资源。</p><div class="security-divider"></div><h3>个人空间上限</h3><div class="rule-stat"><span>单文件</span><strong>20 MiB</strong></div><div class="rule-stat"><span>文件数量</span><strong>50 个</strong></div><div class="rule-stat"><span>个人容量</span><strong>200 MiB</strong></div><div class="rule-stat"><span>今日下载</span><strong id="downloadUsage">载入中</strong></div><small class="security-foot" id="downloadUsageMeta">每日下载流量上限 2 GiB</small><div class="security-divider"></div><h3>全站成本保护</h3><p class="security-foot">全站共享存储上限 8 GiB；每天最多 500 次上传/删除、5,000 次下载、20 GiB 下载量；每月最多 20,000 次上传/删除、200,000 次下载、512 GiB 下载量。达到上限后暂时停止对应操作，额度按 UTC 周期重置。</p><button id="readRules" class="rules-button" type="button">查看上传与下载条例 <span>↗</span></button><p class="security-foot">支持 PDF、Office 文档、图片、音视频与 ZIP。网页、脚本、程序文件不开放上传；平台不提供病毒扫描。</p></aside>
+    </section>
+    <footer class="page-footer"><span><span class="live-dot"></span> LUMON / PRIVATE BY DEFAULT</span><span>文件私有保存 · 下载时由本站验证身份</span><a href="index.html">返回工作空间 ↗</a></footer>
+  </main>
+  <section class="auth-cover" id="authCover" hidden><div class="auth-panel"><span class="auth-icon">L.</span><p class="eyebrow">YOUR SPACE / SIGN IN</p><h1>先登录，<br>再存放重要的东西。</h1><p id="authMessage">个人资源空间仅对登录账户开放。</p><a id="loginLink" class="primary-button" href="loginaccount.html?next=resources.html">登录 Lumon ↗</a><a href="index.html" class="text-link">返回工作空间</a></div></section>
+  <dialog class="rules-dialog" id="rulesDialog" aria-labelledby="rulesTitle"><div class="dialog-head"><div><p class="eyebrow">UPLOAD / DOWNLOAD POLICY</p><h2 id="rulesTitle">资源空间使用条例</h2></div><button class="close-button" id="closeRules" aria-label="关闭条例"><svg><use href="#r-close"/></svg></button></div><div class="policy-content"><section><h3><span>01</span> 上传安全条例</h3><ul><li>只上传你拥有或已获授权保存的文件，不得侵犯版权、隐私、商业秘密或他人权益。</li><li>禁止上传病毒、木马、勒索软件、钓鱼材料、恶意代码、违法内容或用于攻击他人的文件。</li><li>网页、脚本、可执行程序、安装包、快捷方式和宏文件不在支持范围内；扩展名与文件内容不匹配的文件会被拒绝。</li><li>单个文件最多 20 MiB；每个账号最多 50 个文件、个人总容量 200 MiB；全站共享存储上限 8 GiB。请勿通过拆分、伪装或重复上传规避限制。</li><li>每个账号每天最多上传或删除 50 次；全站每天最多 500 次、每月最多 20,000 次上传/删除。达到全站安全阈值后，相关操作会暂时停止。</li><li>平台不提供恶意软件扫描。上传前请使用可信安全软件检查文件；压缩包里的内容也需逐项检查。</li></ul></section><section><h3><span>02</span> 下载安全条例</h3><ul><li>每个账号每天最多下载 500 次、累计 2 GiB；全站每天最多 5,000 次、20 GiB，每月最多 200,000 次、512 GiB。日/月额度按 UTC 周期重置。</li><li>下载前确认文件名和来源。本站将文件作为附件下载，不会在网页中执行或直接打开。</li><li>下载的文件仍可能包含恶意内容。打开前请使用安全软件扫描；不熟悉的压缩包不要直接解压运行其中的程序。</li><li>你仅可访问自己账号中的文件。请勿分享会话、尝试绕过访问限制或将下载内容用于违法用途。</li><li>文件保存和下载受 Cloudflare 平台及网络可用性影响。重要资料请自行保留独立备份。</li></ul></section><p class="policy-note">违规文件可能被限制访问或删除。你对自己上传、保存和下载的内容及其使用方式负责。</p></div><div class="dialog-actions"><button id="acceptRules" class="primary-button" type="button">我已阅读 <span>↗</span></button></div></dialog>
+  <dialog class="download-dialog" id="downloadDialog" aria-labelledby="downloadTitle"><div class="dialog-head"><div><p class="eyebrow">PRIVATE DOWNLOAD</p><h2 id="downloadTitle">下载文件</h2></div><button class="close-button" id="closeDownload" aria-label="关闭下载确认"><svg><use href="#r-close"/></svg></button></div><div class="download-confirm"><div class="download-icon"><svg><use href="#r-download"/></svg></div><strong id="downloadFilename"></strong><p>文件会以附件方式下载。打开前请先扫描；压缩包请检查内容后再解压。</p><label><input id="downloadConsent" type="checkbox"><span>我确认这是自己的文件，并会在打开前进行安全检查。</span></label></div><div class="dialog-actions"><button id="cancelDownload" class="secondary-button" type="button">取消</button><button id="confirmDownload" class="primary-button" type="button" disabled>确认下载 ↓</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
