@@ -5577,6 +5577,7 @@
     .header-fab.is-expanded .fab-action-item:nth-child(4) { transition-delay: 0.105s; }
     .header-fab.is-expanded .fab-action-item:nth-child(5) { transition-delay: 0.13s; }
     .header-fab.is-expanded .fab-action-item:nth-child(6) { transition-delay: 0.155s; }
+    .header-fab.is-expanded .fab-action-item:nth-child(8) { transition-delay: 0.205s; }
     .header-fab.is-expanded .fab-action-item:nth-child(7) { transition-delay: 0.18s; }
 
     .fab-action-item:hover,
@@ -5726,6 +5727,10 @@
 
     .dock-app-item[data-app="dashboard"] {
       --dock-color: #4e7f3a;
+    }
+
+    .dock-app-item[data-app="playcenter"] {
+      --dock-color: #8c72ff;
     }
 
     .dock-app-item[data-app="announcement"] {
@@ -6152,6 +6157,10 @@
     <symbol id="i-container" viewBox="0 0 24 24">
       <path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/>
     </symbol>
+    <symbol id="i-gamepad" viewBox="0 0 24 24">
+      <path d="M8 7h8c3 0 5 9 4 11s-4-1-6-3h-4c-2 2-5 5-6 3S5 7 8 7Z"/>
+      <path d="M7 10v5m-2.5-2.5h5M16 11h.01M18 14h.01"/>
+    </symbol>
     <symbol id="i-megaphone" viewBox="0 0 24 24">
       <path d="m3 11 18-5v12L3 14v-3Z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
     </symbol>
@@ -6351,6 +6360,10 @@
             <a class="fab-action-item" href="dashviewer.html" role="menuitem" aria-label="打开访问监控" data-fab-link>
               <span class="f-icon"><svg class="icon"><use href="#i-chart"></use></svg></span>
               <span class="f-lbl">监控</span>
+            </a>
+            <a class="fab-action-item" href="playcenter.html" role="menuitem" aria-label="打开游戏大厅" data-route data-fab-link>
+              <span class="f-icon"><svg class="icon"><use href="#i-gamepad"></use></svg></span>
+              <span class="f-lbl">游戏</span>
             </a>
             <a class="fab-action-item" href="announcement.html" role="menuitem" aria-label="打开公告中心" data-route data-fab-link>
               <span class="f-icon"><svg class="icon"><use href="#i-megaphone"></use></svg></span>
@@ -6813,6 +6826,11 @@
       <a class="dock-app-item" href="dashviewer.html" data-app="dashboard" data-route data-dock-link aria-label="打开访问监控">
         <svg class="icon"><use href="#i-chart"></use></svg>
         <span class="dock-tooltip">访问监控</span>
+        <span class="dock-app-dot"></span>
+      </a>
+      <a class="dock-app-item" href="playcenter.html" data-app="playcenter" data-route data-dock-link aria-label="打开游戏大厅">
+        <svg class="icon"><use href="#i-gamepad"></use></svg>
+        <span class="dock-tooltip">游戏大厅</span>
         <span class="dock-app-dot"></span>
       </a>
       <a class="dock-app-item" href="announcement.html" data-app="announcement" data-route data-dock-link aria-label="打开公告中心">
@@ -9907,6 +9925,18 @@
           action: () => {
             closeCommand();
             transitionTo("dashviewer.html", "ACCESS OBSERVATORY");
+          }
+        },
+        {
+          group: "Navigate",
+          title: "游戏大厅",
+          detail: "2048、贪吃蛇、记忆翻牌和反应挑战",
+          icon: "gamepad",
+          key: "P",
+          keywords: "play games arcade 2048 snake 游戏 大厅 贪吃蛇 翻牌 反应",
+          action: () => {
+            closeCommand();
+            transitionTo("playcenter.html", "LUMON PLAY");
           }
         },
         {

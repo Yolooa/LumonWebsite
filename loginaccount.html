@@ -1547,6 +1547,20 @@
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const localTestMode = ["127.0.0.1", "localhost"].includes(location.hostname);
       const nextParam = new URLSearchParams(location.search).get("next") || "";
+      const desktopQuery = new URLSearchParams(location.search);
+      const desktopAuth = (() => {
+        if (desktopQuery.get("desktop") !== "1") return null;
+        const challenge = desktopQuery.get("challenge") || "";
+        const callback = desktopQuery.get("callback") || "";
+        try {
+          const url = new URL(callback);
+          if (url.protocol !== "http:" || !["127.0.0.1", "localhost"].includes(url.hostname)) return null;
+          if (challenge.length < 32 || challenge.length > 128) return null;
+          return { challenge, callback, mode: desktopQuery.get("mode") === "register" ? "register" : "login" };
+        } catch {
+          return null;
+        }
+      })();
       const turnstileConfig = window.PELLOSY_TURNSTILE || {};
       const tokens = { login: "", register: "" };
       const widgets = { login: null, register: null };
@@ -1709,6 +1723,18 @@
         window.setTimeout(() => renderTurnstile(next), 80);
       }
 
+      function completeDesktopHandoff(user) {
+        if (!desktopAuth) return false;
+        if (!user?.desktopTicket) {
+          throw new Error("桌面授权票据未生成，请重新部署最新的 Cloudflare Functions");
+        }
+        const callback = new URL(desktopAuth.callback);
+        callback.searchParams.set("ticket", user.desktopTicket);
+        callback.searchParams.set("challenge", desktopAuth.challenge);
+        window.location.replace(callback.toString());
+        return true;
+      }
+
       function turnstileEnabled() {
         return turnstileConfig.enabled !== false;
       }
@@ -1861,10 +1887,11 @@
         try {
           const token = requireToken("login");
           const user = await cloud.login(
-            { identifier, password, turnstileToken: token },
+            { identifier, password, turnstileToken: token, desktopChallenge: desktopAuth?.challenge },
             $("#rememberSession").checked
           );
           applySession(user);
+          if (completeDesktopHandoff(user)) return;
           setFormStatus("login", "登录成功", "success");
           showToast(`欢迎回来，${user.name}`);
         } catch (error) {
@@ -1903,10 +1930,11 @@
         try {
           const token = requireToken("register");
           const user = await cloud.register(
-            { username, email, password, turnstileToken: token },
+            { username, email, password, turnstileToken: token, desktopChallenge: desktopAuth?.challenge },
             true
           );
           applySession(user);
+          if (completeDesktopHandoff(user)) return;
           setFormStatus("register", "账户已创建", "success");
           showToast(`账户已创建，${user.name}`);
         } catch (error) {
@@ -1944,6 +1972,9 @@
           $("#localTestHint").hidden = false;
           $("#loginIdentifier").value = "testuser";
           $("#loginPassword").value = "test1234";
+        }
+        if (desktopAuth) {
+          setTab(desktopAuth.mode);
         }
         applySession(currentUser);
         $$("[data-auth-tab]").forEach((button) => {

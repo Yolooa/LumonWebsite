@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="glass">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e8eef5">
+  <meta name="description" content="Lumon Play 游戏大厅。2048、贪吃蛇、记忆翻牌与反应挑战，给今天留一点好玩的时间。">
+  <title>Play / Lumon 游戏大厅</title>
+  <script src="theme-sync.js"></script>
+  <link rel="stylesheet" href="assets/playcenter.css?v=community-1">
+  <link rel="stylesheet" href="assets/playcenter-community.css?v=community-1">
+  <script src="assets/playcenter.js?v=community-1" defer></script>
+  <script src="assets/playcenter-community.js?v=community-1" defer></script>
+  <script src="visit-track.js" defer></script>
+</head>
+<body>
+  <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="p-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="p-game" viewBox="0 0 24 24"><path d="M8 7h8c3 0 5 9 4 11s-4-1-6-3h-4c-2 2-5 5-6 3S5 7 8 7Z"/><path d="M7 10v5m-2.5-2.5h5M16 11h.01M18 14h.01"/></symbol>
+    <symbol id="p-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></symbol>
+    <symbol id="p-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></symbol>
+    <symbol id="p-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="p-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="p-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="p-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="p-shuffle" viewBox="0 0 24 24"><path d="M3 6h3c4 0 8 12 12 12h3m-4-4 4 4-4 4M3 18h3c4 0 8-12 12-12h3m-4-4 4 4-4 4"/></symbol>
+    <symbol id="p-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4Zm12-1c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></symbol>
+    <symbol id="p-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></symbol>
+  </defs></svg>
+
+  <div class="ambient" aria-hidden="true"><div class="ambient-orb"></div><svg class="field-lines" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="currentColor"><path d="M-200 600Q400 60 1000 550T1800 260"/><path d="M-200 625Q400 85 1000 575T1800 285"/><path d="M-200 650Q400 110 1000 600T1800 310"/><path d="M-200 675Q400 135 1000 625T1800 335"/><path d="M-200 700Q400 160 1000 650T1800 360"/><path d="M-200 725Q400 185 1000 675T1800 385"/><path d="M-200 750Q400 210 1000 700T1800 410"/><path d="M-200 775Q400 235 1000 725T1800 435"/></g></svg><span class="ambient-plus plus-one">+</span><span class="ambient-plus plus-two">+</span></div>
+
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="返回 Lumon 主页面">lumon<span class="brand-dot"></span><span class="brand-section">/ PLAY</span></a>
+    <nav class="topnav" aria-label="站点导航"><a href="index.html">工作空间</a><a href="playcenter.html" aria-current="page">游戏大厅<span class="live-dot"></span></a><a href="messagessend.html">私信</a></nav>
+    <div class="top-actions"><button class="icon-button" id="soundToggle" aria-label="开启游戏音效" aria-pressed="false" title="游戏音效"><svg><use href="#p-sound"/></svg><span class="sound-slash"></span></button><button class="theme-button" id="themeToggle" title="切换主题"><svg><use href="#p-sun"/></svg><span id="themeLabel">流体玻璃</span></button><a class="home-button" href="index.html" aria-label="返回工作空间"><svg><use href="#p-arrow"/></svg></a></div>
+  </header>
+
+  <main class="page">
+    <section class="hero reveal" aria-labelledby="heroTitle">
+      <div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> LUMON PLAYGROUND <span class="edition">VOL. 001 / 随时开玩</span></div><h1 id="heroTitle" aria-label="给今天，一点好玩。"><span class="hero-fixed">PAUSE WORK.</span><span class="typing-line"><span id="typedHeadline" aria-hidden="true">PRESS PLAY.</span><span class="type-caret" aria-hidden="true"></span></span></h1><div class="hero-bottom"><p>给今天，一点好玩。<br><span>暂存忙碌，让快乐先加载。</span></p><button class="random-button" id="randomGame"><svg><use href="#p-shuffle"/></svg> 随机开一局 <span>↗</span></button></div></div>
+      <div class="hero-note"><span class="note-orbit" aria-hidden="true">✳</span><span>JUST ONE<br>MORE ROUND.</span><small>不必每一刻<br>都那么有用。</small></div>
+    </section>
+
+    <section class="play-layout" aria-label="游戏与游玩记录">
+      <div class="collection">
+        <div class="creator-bar reveal"><div><span class="micro-label">MADE BY YOU. PLAYED BY EVERYONE.</span><p>把你的灵感，变成下一局。</p></div><button class="upload-entry" id="uploadGameButton"><span>＋</span> 上传我的游戏 <span>↗</span></button></div>
+        <div class="collection-toolbar reveal"><div class="filter-tabs" role="group" aria-label="游戏分类"><button class="filter active" data-filter="all" aria-pressed="true">全部 <span id="gameCount">04</span></button><button class="filter" data-filter="puzzle" aria-pressed="false">益智</button><button class="filter" data-filter="arcade" aria-pressed="false">街机</button><button class="filter" data-filter="reaction" aria-pressed="false">反应</button><button class="filter" data-filter="community" aria-pressed="false">创作</button><button class="filter" data-filter="mine" aria-pressed="false">我的作品</button><button class="filter favorite-filter" data-filter="favorites" aria-pressed="false"><svg><use href="#p-star"/></svg><span>收藏</span></button></div><label class="search"><svg><use href="#p-search"/></svg><input id="gameSearch" type="search" aria-label="搜索游戏" placeholder="找点好玩的" autocomplete="off"></label></div>
+
+        <div class="game-grid" id="gameGrid">
+          <article class="game-card featured reveal" data-game="2048" data-category="puzzle" data-search="2048 数字 合并 益智 puzzle" style="--card-order:0">
+            <button class="favorite-button" data-favorite="2048" aria-label="收藏 2048" aria-pressed="false"><svg><use href="#p-star"/></svg></button>
+            <button class="game-launch" data-launch="2048" aria-label="开始玩 2048"><div class="feature-top"><span class="card-tag">今日推荐 / THE CLASSIC</span><span class="game-number">01</span></div><div class="feature-art" aria-hidden="true"><div class="tile-orbit orbit-one"></div><div class="tile-orbit orbit-two"></div><span class="float-number number-small">2</span><span class="float-number number-mid">32</span><div class="hero-tile"><span>20<br>48<span class="tile-spark">✳</span></span></div><span class="float-number number-bottom">128</span><span class="art-plus">+</span></div><div class="card-info"><div><span class="micro-label">MERGE. THINK. REPEAT.</span><h2>2048<span class="feature-title-note">每一步，都算数。</span></h2><p>滑动、合并，让灵感翻倍。</p><div class="card-meta"><span>数字益智</span><span>键盘 / 触屏</span><span>随时续玩</span></div></div><span class="play-circle"><svg><use href="#p-arrow"/></svg></span></div></button>
+          </article>
+
+          <article class="game-card snake-card reveal" data-game="snake" data-category="arcade" data-search="snake 贪吃蛇 街机 arcade" style="--card-order:1"><button class="favorite-button" data-favorite="snake" aria-label="收藏 贪吃蛇" aria-pressed="false"><svg><use href="#p-star"/></svg></button><button class="game-launch" data-launch="snake" aria-label="开始玩贪吃蛇"><div class="mini-art snake-art" aria-hidden="true"><span class="mini-index">02 / ARCADE</span><svg viewBox="0 0 320 155"><defs><pattern id="snakeDots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1" fill="currentColor" opacity=".18"/></pattern></defs><rect width="320" height="155" fill="url(#snakeDots)"/><path class="snake-path" d="M60 112H145Q165 112 165 92V60Q165 42 183 42H240"/><circle cx="238" cy="38" r="2.5" fill="#142c22"/><circle cx="238" cy="47" r="2.5" fill="#142c22"/><circle class="snake-food" cx="277" cy="95" r="9" fill="#f26f4a"/><path d="m277 80 4-5" stroke="#527237" stroke-width="2"/></svg></div><div class="mini-card-info"><div><span class="micro-label">CHASE THE LITTLE THINGS.</span><h2>贪吃蛇 <span>SNAKE</span></h2><p>经典快乐，一口一口来。</p></div><span class="small-arrow">↗</span></div><div class="card-meta"><span>经典街机</span><span>方向键 / 触屏</span></div></button></article>
+
+          <article class="game-card memory-card reveal" data-game="memory" data-category="puzzle" data-search="memory 记忆 翻牌 配对 益智 puzzle" style="--card-order:2"><button class="favorite-button" data-favorite="memory" aria-label="收藏 记忆翻牌" aria-pressed="false"><svg><use href="#p-star"/></svg></button><button class="game-launch" data-launch="memory" aria-label="开始玩记忆翻牌"><div class="mini-art memory-art" aria-hidden="true"><span class="mini-index">03 / PUZZLE</span><div class="memory-stack"><span>✳</span><span class="mini-back">l.</span><span>✳</span></div></div><div class="mini-card-info"><div><span class="micro-label">A LITTLE DEJA VU.</span><h2>记忆翻牌 <span>MATCH</span></h2><p>似曾相识，刚好成双。</p></div><span class="small-arrow">↗</span></div><div class="card-meta"><span>记忆配对</span><span>16 张卡片</span></div></button></article>
+
+          <article class="game-card reaction-card reveal" data-game="reaction" data-category="reaction" data-search="reaction 反应 挑战 速度 点击" style="--card-order:3"><button class="favorite-button" data-favorite="reaction" aria-label="收藏 反应挑战" aria-pressed="false"><svg><use href="#p-star"/></svg></button><button class="game-launch" data-launch="reaction" aria-label="开始玩反应挑战"><div class="reaction-art" aria-hidden="true"><span class="mini-index">04 / REFLEX</span><div class="radar"><i></i><i></i><i></i><span>↯</span></div></div><div class="mini-card-info"><div><span class="micro-label">DON’T THINK. JUST TAP.</span><h2>反应挑战 <span>REFLEX</span></h2><p>等到变绿。然后，快一点。</p></div><span class="small-arrow">↗</span></div><div class="card-meta"><span>手速挑战</span><span>毫秒计时</span></div></button></article>
+        </div>
+        <div class="empty-state" id="emptyState" hidden><svg><use href="#p-game"/></svg><h2>这里还没有游戏</h2><p id="emptyMessage">换个关键词，再找找看。</p><button class="text-button" id="resetFilters">查看全部游戏 ↗</button></div>
+        <div class="community-status"><span id="communityStatus" role="status">正在接通创作游戏…</span><button id="refreshCommunity" type="button">↻ 刷新作品</button><button id="loadMoreGames" type="button" hidden>加载更多 ↓</button></div>
+      </div>
+
+      <aside class="side-panel reveal"><div class="side-heading"><span>你的游乐角</span><svg><use href="#p-game"/></svg></div><div class="session-time"><span class="micro-label">A LITTLE TIME FOR YOURSELF</span><strong id="localClock">--:--</strong><span id="dateLabel">让快乐发生在此刻。</span></div><div class="side-section"><h2><svg><use href="#p-clock"/></svg> 最近游玩</h2><div id="recentGames" class="recent-list"><p class="side-empty">第一局，从喜欢的开始。<br>你的游玩记录会留在这里。</p></div></div><div class="side-section records-section"><h2><svg><use href="#p-star"/></svg> 个人最佳</h2><div id="bestScores" class="record-list"></div><p class="local-note">记录保存在当前浏览器。</p></div><button class="side-surprise" id="surpriseButton"><span class="surprise-icon">✳</span><span>选择困难？<small>让好运替你按下开始。</small></span><svg><use href="#p-arrow"/></svg></button></aside>
+    </section>
+    <footer class="footer"><span><span class="live-dot"></span> 小游戏，大快乐。</span><span>LUMON PLAY / MADE FOR YOUR BREAK.</span><a href="index.html">回到工作空间 ↗</a></footer>
+  </main>
+
+  <dialog class="game-dialog" id="gameDialog" aria-labelledby="gameTitle"><div class="game-window"><header class="game-window-header"><div class="game-window-title"><span class="live-dot"></span><span class="micro-label">NOW PLAYING</span><h2 id="gameTitle">2048</h2></div><div class="window-actions"><button class="icon-button" id="fullscreenButton" aria-label="切换游戏全屏" title="全屏"><svg><use href="#p-expand"/></svg></button><button class="icon-button close-game" id="closeGame" aria-label="退出游戏"><svg><use href="#p-close"/></svg></button></div></header><div class="game-status-bar"><div><span id="scoreLabel">本局得分</span><strong id="gameScore">0</strong></div><div><span id="bestLabel">个人最佳</span><strong id="gameBest">—</strong></div><button class="restart-button" id="restartGame">↻ 重新开始</button></div><div class="game-stage" id="gameStage"></div><div class="game-message" id="gameMessage" role="status" aria-live="polite"></div><div class="game-help"><p id="gameHelp"></p><span><kbd>Esc</kbd> 返回大厅</span></div></div></dialog>
+  <dialog class="upload-dialog" id="uploadDialog" aria-labelledby="uploadTitle">
+    <div class="upload-window">
+      <header class="upload-header"><div><span class="micro-label">LUMON / CREATOR STUDIO</span><h2 id="uploadTitle">你的游戏，值得被玩到。</h2></div><button class="icon-button" id="closeUpload" type="button" aria-label="关闭上传窗口"><svg><use href="#p-close"/></svg></button></header>
+      <p id="uploadChecking" class="upload-status" role="status" hidden>正在确认你的登录状态…</p>
+      <div id="uploadAuth" class="upload-auth" hidden><span class="auth-art">✦</span><h3>先认识你，再分享你的创作。</h3><p>登录 Lumon，上传和管理属于你的游戏。</p><a class="upload-entry" href="loginaccount.html?next=playcenter.html%23upload">登录 / 注册 ↗</a></div>
+      <form id="uploadForm" hidden>
+        <input type="file" id="gameFile" accept=".html,.htm,text/html" hidden>
+        <button class="file-drop" id="fileDrop" type="button"><span class="file-glyph">&lt;/&gt;</span><strong id="fileName">把游戏拖到这里</strong><span id="fileHint">或点击选择 .html / .htm 文件 · 最多 1 MiB</span><small>单文件 HTML：请将 JS、CSS、图片与音频打包或内嵌到文件中。</small></button>
+        <div class="upload-fields"><label>游戏名称 <span>*</span><input name="title" id="uploadName" maxlength="60" required placeholder="给你的游戏起个名字" autocomplete="off"></label><label>游戏分类<select name="category" id="uploadCategory"><option value="other">其他创意</option><option value="puzzle">益智解谜</option><option value="arcade">街机动作</option><option value="reaction">反应挑战</option></select></label><label class="full-field">一句话介绍<textarea name="summary" id="uploadSummary" maxlength="180" rows="2" placeholder="这是一款怎样的游戏？让玩家想点开它。"></textarea></label><label class="full-field">操作说明<textarea name="instructions" id="uploadInstructions" maxlength="500" rows="2" placeholder="例如：方向键移动，空格跳跃；手机点击屏幕操作。"></textarea></label></div>
+        <div class="creator-options"><fieldset><legend>选一张封面色</legend><label class="color-option coral"><input type="radio" name="color" value="coral" aria-label="珊瑚色"><span></span></label><label class="color-option violet"><input type="radio" name="color" value="violet" aria-label="紫罗兰" checked><span></span></label><label class="color-option green"><input type="radio" name="color" value="green" aria-label="森林绿"><span></span></label><label class="color-option blue"><input type="radio" name="color" value="blue" aria-label="天空蓝"><span></span></label></fieldset><label class="visibility-label">谁可以玩<select name="visibility" id="uploadVisibility"><option value="private">仅自己可见</option><option value="public">公开到游戏大厅</option></select></label></div>
+        <label class="creator-consent"><input type="checkbox" id="creatorConsent" required><span>这是我创作或已获授权发布的游戏，我同意 <a href="useragreement.html" target="_blank" rel="noopener">用户条例</a>。</span></label>
+        <p class="upload-note">每个账号最多 20 款、总计 10 MiB。游戏在独立沙箱运行，不支持外部网络资源、账号接口或浏览器本地存储。</p>
+        <div class="upload-progress" id="uploadProgress" hidden><progress max="100" value="0" id="uploadProgressBar"></progress><span id="uploadProgressText">准备上传…</span></div>
+        <p class="upload-status" id="uploadStatus" role="status" aria-live="polite"></p>
+        <div class="upload-actions"><button id="deleteGameButton" class="delete-game" type="button" hidden>删除作品</button><button class="preview-button" id="previewUpload" type="button">▷ 本地试玩</button><button class="publish-button" id="publishGame" type="submit">保存我的游戏 ↗</button></div>
+        <div class="delete-confirm" id="deleteConfirm" hidden><p>删除后，作品和分享链接会立即失效，无法撤销。</p><button id="cancelDelete" type="button">保留作品</button><button id="confirmDelete" type="button">确认删除</button></div>
+      </form>
+    </div>
+  </dialog>
+  <dialog class="preview-dialog" id="previewDialog" aria-labelledby="previewTitle"><div class="preview-top"><div><span class="micro-label">LOCAL PREVIEW / 尚未上传</span><h2 id="previewTitle">试玩你的游戏</h2></div><button class="icon-button" id="closePreview" aria-label="关闭本地试玩"><svg><use href="#p-close"/></svg></button></div><div id="previewStage" class="preview-stage"></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-dot"></span><span id="toastText"></span></div>
+  <div class="opening" id="opening" aria-hidden="true"><span class="opening-panel"></span><span class="opening-panel"></span><span class="opening-panel"></span><div class="opening-copy"><span>LUMON / PLAY DIVISION</span><strong>LET’S PLAY<span>✳</span></strong><small>忙碌暂停，快乐接通。</small></div></div>
+  <noscript><div class="noscript-note">请开启 JavaScript 来游玩这些游戏。<a href="index.html">返回主页面</a></div></noscript>
+</body>
+</html>
