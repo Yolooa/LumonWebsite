@@ -198,8 +198,8 @@ export async function onRequest(context) {
     const id = parts[0];
     if (method !== "GET") requireOrigin(request);
     const { user, db } = await requireUser(context);
-    const bucket = env.ASSETS;
-    if (!bucket) throw new ApiError("文件空间尚未绑定 Cloudflare R2（变量名 ASSETS）", 503, "R2_NOT_BOUND");
+    const bucket = env.RESOURCE_BUCKET;
+    if (!bucket) throw new ApiError("文件空间尚未绑定 Cloudflare R2（变量名 RESOURCE_BUCKET）", 503, "R2_NOT_BOUND");
     await ensureSchema(db);
 
     if (method === "GET" && !id) {
